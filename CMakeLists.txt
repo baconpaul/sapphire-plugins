@@ -25,9 +25,15 @@ include(libs/sst/sst-plugininfra/cmake/git-version-functions.cmake)
 version_from_versionfile_or_git()
 message(STATUS "DISPLAY_VERSION=${GIT_IMPLIED_DISPLAY_VERSION}; COMMIT_HASH=${GIT_COMMIT_HASH}; BRANCH=${GIT_BRANCH}")
 
-
 set(JUCE_PATH "${CMAKE_SOURCE_DIR}/libs/JUCE")
 add_subdirectory(libs)
+
+include(cmake/CmakeRC.cmake)
+
+file(GLOB_RECURSE GRAPHICS  "res/knob_graphics/*" "libs/sapphire/res/*.svg")
+list(LENGTH GRAPHICS glen)
+message(STATUS "Adding ${glen} graphics files to the binary image")
+cmrc_add_resource_library(${PROJECT_NAME}-graphics NAMESPACE sapphire_graphics ${GRAPHICS})
 
 set(ELASTIKA_DIR libs/sapphire/src)
 add_library(elastika-dsp STATIC
@@ -56,6 +62,7 @@ target_link_libraries(${PROJECT_NAME}-impl PUBLIC
 )
 target_link_libraries(${PROJECT_NAME}-impl PRIVATE
         elastika-dsp
+        ${PROJECT_NAME}-graphics
         simde
         clap-helpers clap-wrapper-extensions
         fmt-header-only
