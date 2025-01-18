@@ -22,6 +22,7 @@
 #include <memory>
 #include "sst/clap_juce_shim/clap_juce_shim.h"
 
+#include "elastika_engine.hpp"
 #include "elastika.h"
 #include "patch.h"
 #include "editor.h"
@@ -56,7 +57,57 @@ const clap_plugin_descriptor *getDescriptor()
 
 struct ElastikaClap : public plugHelper_t, sst::clap_juce_shim::EditorProvider
 {
-    ElastikaClap(const clap_host *h) : plugHelper_t(getDescriptor(), h) {}
+    std::unique_ptr<Sapphire::ElastikaEngine> engine;
+
+    ElastikaClap(const clap_host *h) : plugHelper_t(getDescriptor(), h)
+    {
+        engine = std::make_unique<Sapphire::ElastikaEngine>();
+    }
+
+    double sampleRate{0};
+
+  protected:
+    bool init() noexcept override { return true; }
+    bool activate(double sampleRate, uint32_t minFrameCount,
+                  uint32_t maxFrameCount) noexcept override
+    {
+        this->sampleRate = sampleRate;
+        return true;
+    }
+    void deactivate() noexcept override {}
+    clap_process_status process(const clap_process *process) noexcept override
+    {
+        float **in = process->audio_inputs[0].data32;
+        float **out = process->audio_outputs[0].data32;
+
+        for (auto s = 0U; s < process->frames_count; ++s)
+        {
+            engine->process(sampleRate, in[0][s], in[1][s], out[0][s], out[1][s]);
+        }
+
+        return CLAP_PROCESS_CONTINUE;
+    }
+    void reset() noexcept override { engine->quiet(); }
+
+    bool implementsAudioPorts() const noexcept override { return true; }
+    uint32_t audioPortsCount(bool isInput) const noexcept override { return 1; }
+    bool audioPortsInfo(uint32_t index, bool isInput,
+                        clap_audio_port_info *info) const noexcept override
+    {
+        if (index != 0)
+            return false;
+        info->id = isInput ? 2112 : 90125;
+        info->in_place_pair = isInput ? 90125 : 2112;
+
+        if (isInput)
+            strncpy(info->name, "Main Input", sizeof(info->name));
+        else
+            strncpy(info->name, "Main Out", sizeof(info->name));
+        info->flags = CLAP_AUDIO_PORT_IS_MAIN;
+        info->channel_count = 2;
+        info->port_type = CLAP_PORT_STEREO;
+        return true;
+    }
 
   public:
     bool implementsGui() const noexcept override

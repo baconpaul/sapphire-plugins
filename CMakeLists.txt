@@ -29,6 +29,18 @@ message(STATUS "DISPLAY_VERSION=${GIT_IMPLIED_DISPLAY_VERSION}; COMMIT_HASH=${GI
 set(JUCE_PATH "${CMAKE_SOURCE_DIR}/libs/JUCE")
 add_subdirectory(libs)
 
+set(ELASTIKA_DIR libs/sapphire/src)
+add_library(elastika-dsp STATIC
+        ${ELASTIKA_DIR}/mesh_physics.cpp
+        ${ELASTIKA_DIR}/elastika_mesh.cpp
+        ${ELASTIKA_DIR}/sapphire_panel.cpp
+)
+target_include_directories(elastika-dsp PUBLIC ${ELASTIKA_DIR} libs/simde)
+target_compile_definitions(elastika-dsp PUBLIC NO_RACK_DEPENDENCY)
+if (WIN32)
+    target_compile_definitions(elastika-dsp PUBLIC _USE_MATH_DEFINES)
+endif()
+
 add_library(${PROJECT_NAME}-impl STATIC
         src/clap/sapphire-clap-entry-impl.cpp
 
@@ -43,6 +55,7 @@ target_link_libraries(${PROJECT_NAME}-impl PUBLIC
         clap
 )
 target_link_libraries(${PROJECT_NAME}-impl PRIVATE
+        elastika-dsp
         simde
         clap-helpers clap-wrapper-extensions
         fmt-header-only
