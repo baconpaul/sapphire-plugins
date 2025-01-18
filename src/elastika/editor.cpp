@@ -45,7 +45,7 @@ struct IdleTimer : juce::Timer
     void timerCallback() override { editor.idle(); }
 };
 
-ElastikaEditor::ElastikaEditor(audioToUIQueue_t &atou, uiToAudioQueue_T &utoa,
+ElastikaEditor::ElastikaEditor(shared::audioToUIQueue_t &atou, shared::uiToAudioQueue_T &utoa,
                                std::function<void()> flushOperator)
     : audioToUI(atou), uiToAudio(utoa), flushOperator(flushOperator)
 {
@@ -72,31 +72,31 @@ ElastikaEditor::ElastikaEditor(audioToUIQueue_t &atou, uiToAudioQueue_T &utoa,
     }
 
     input_tilt_knob = make_large_knob("input_tilt_knob");
-    bindSlider(input_tilt_knob, patchCopy.inputTilt);
+    shared::bindSlider(this, input_tilt_knob, patchCopy.inputTilt);
 
     output_tilt_knob = make_large_knob("output_tilt_knob");
-    bindSlider(output_tilt_knob, patchCopy.outputTilt);
+    shared::bindSlider(this, output_tilt_knob, patchCopy.outputTilt);
 
     drive_knob = make_large_knob("drive_knob");
-    bindSlider(drive_knob, patchCopy.drive);
+    shared::bindSlider(this, drive_knob, patchCopy.drive);
 
     level_knob = make_large_knob("level_knob");
-    bindSlider(level_knob, patchCopy.level);
+    shared::bindSlider(this, level_knob, patchCopy.level);
 
     fric_slider = make_slider("fric_slider");
-    bindSlider(fric_slider, patchCopy.friction);
+    shared::bindSlider(this, fric_slider, patchCopy.friction);
 
     curl_slider = make_slider("curl_slider");
-    bindSlider(curl_slider, patchCopy.curl);
+    shared::bindSlider(this, curl_slider, patchCopy.curl);
 
     span_slider = make_slider("span_slider");
-    bindSlider(span_slider, patchCopy.span);
+    shared::bindSlider(this, span_slider, patchCopy.span);
 
     mass_slider = make_slider("mass_slider");
-    bindSlider(mass_slider, patchCopy.mass);
+    shared::bindSlider(this, mass_slider, patchCopy.mass);
 
     stif_slider = make_slider("stif_slider");
-    bindSlider(stif_slider, patchCopy.stiffness);
+    shared::bindSlider(this, stif_slider, patchCopy.stiffness);
 
     setSize(300, 600);
     resized();
@@ -104,12 +104,12 @@ ElastikaEditor::ElastikaEditor(audioToUIQueue_t &atou, uiToAudioQueue_T &utoa,
     idleTimer = std::make_unique<IdleTimer>(*this);
     idleTimer->startTimer(1000. / 60.);
 
-    uiToAudio.push({UIToAudioMsg::EDITOR_ATTACH_DETATCH, true});
+    uiToAudio.push({shared::UIToAudioMsg::EDITOR_ATTACH_DETATCH, true});
 }
 
 ElastikaEditor::~ElastikaEditor()
 {
-    uiToAudio.push({UIToAudioMsg::EDITOR_ATTACH_DETATCH, false});
+    uiToAudio.push({shared::UIToAudioMsg::EDITOR_ATTACH_DETATCH, false});
     idleTimer->stopTimer();
 }
 
@@ -121,36 +121,7 @@ void ElastikaEditor::resized()
     }
 }
 
-void ElastikaEditor::idle()
-{
-    auto aum = audioToUI.pop();
-    while (aum.has_value())
-    {
-        switch (aum->action)
-        {
-        case AudioToUIMsg::UPDATE_PARAM:
-        {
-            auto pid = aum->paramId;
-            auto val = aum->value;
-            auto p = patchCopy.paramMap.at(pid);
-            if (p)
-            {
-                p->value = val;
-                auto val01 = (val - p->meta.minVal) / (p->meta.maxVal - p->meta.minVal);
-                auto sbi = sliderByID.find(pid);
-                if (sbi != sliderByID.end() && sbi->second)
-                {
-                    sbi->second->setValue(val01, juce::dontSendNotification);
-                }
-            }
-        }
-        break;
-        case AudioToUIMsg::UPDATE_VU:
-            break;
-        }
-        aum = audioToUI.pop();
-    }
-}
+void ElastikaEditor::idle() { shared::drainQueueFromUI(*this); }
 
 std::unique_ptr<juce::Slider> ElastikaEditor::make_large_knob(const std::string &pos)
 {
@@ -203,32 +174,6 @@ std::unique_ptr<juce::Slider> ElastikaEditor::make_slider(const std::string &pos
     background->addAndMakeVisible(*sl);
     set_control_position(*sl, cx, cy, dx, dy);
     return sl;
-}
-
-void ElastikaEditor::bindSlider(const std::unique_ptr<juce::Slider> &slider, Param &p)
-{
-    slider->setTitle(p.meta.name);
-    auto val01 = (p.value - p.meta.minVal) / (p.meta.maxVal - p.meta.minVal);
-    slider->setValue(val01, juce::dontSendNotification);
-
-    slider->onDragStart = [this, id = p.meta.id]() {
-        uiToAudio.push({UIToAudioMsg::BEGIN_EDIT, id});
-    };
-
-    slider->onDragEnd = [this, id = p.meta.id]() { uiToAudio.push({UIToAudioMsg::END_EDIT, id}); };
-
-    slider->onValueChange = [this, sl = slider.get(), par = p]()
-    {
-        float val = sl->getValue();
-        // val is 0..1 so
-        val = val * (par.meta.maxVal - par.meta.minVal) + par.meta.minVal;
-
-        uiToAudio.push({UIToAudioMsg::SET_PARAM, par.meta.id, val});
-        if (flushOperator)
-            flushOperator();
-    };
-
-    sliderByID[p.meta.id] = juce::Component::SafePointer<juce::Slider>(slider.get());
 }
 
 } // namespace sapphire_plugins::elastika

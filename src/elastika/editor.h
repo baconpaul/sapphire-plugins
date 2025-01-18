@@ -20,41 +20,15 @@
 #include "shared/sapphire_lnf.h"
 
 #include "patch.h"
+#include "shared/editor_interactions.h"
 
 namespace sapphire_plugins::elastika
 {
-
-struct AudioToUIMsg
-{
-    enum Action : uint32_t
-    {
-        UPDATE_PARAM,
-        UPDATE_VU,
-    } action;
-    uint32_t paramId{0};
-    float value{0}, value2{0};
-};
-struct UIToAudioMsg
-{
-    enum Action : uint32_t
-    {
-        REQUEST_REFRESH,
-        SET_PARAM,
-        BEGIN_EDIT,
-        END_EDIT,
-        EDITOR_ATTACH_DETATCH, // paramid is true for attach and false for detach
-    } action;
-    uint32_t paramId{0};
-    float value{0};
-};
-using audioToUIQueue_t = sst::cpputils::SimpleRingBuffer<AudioToUIMsg, 1024 * 16>;
-using uiToAudioQueue_T = sst::cpputils::SimpleRingBuffer<UIToAudioMsg, 1024 * 64>;
-
 struct ElastikaEditor : public juce::Component
 {
     Patch patchCopy;
 
-    ElastikaEditor(audioToUIQueue_t &atou, uiToAudioQueue_T &utoa,
+    ElastikaEditor(shared::audioToUIQueue_t &atou, shared::uiToAudioQueue_T &utoa,
                    std::function<void()> flushOperator);
     ~ElastikaEditor();
 
@@ -83,8 +57,8 @@ struct ElastikaEditor : public juce::Component
 
     std::unique_ptr<shared::LookAndFeel> lnf;
 
-    audioToUIQueue_t &audioToUI;
-    uiToAudioQueue_T &uiToAudio;
+    shared::audioToUIQueue_t &audioToUI;
+    shared::uiToAudioQueue_T &uiToAudio;
     std::function<void()> flushOperator;
 };
 } // namespace sapphire_plugins::elastika
