@@ -1,4 +1,4 @@
-name: Build Six Sines
+name: Build Sapphire
 on:
   push:
     branches:
@@ -54,7 +54,7 @@ jobs:
         if: github.event_name != 'pull_request'
         run: |
           cmake -S . -B ./build ${{ matrix.cmake_args }} -DCMAKE_BUILD_TYPE=Release -DCOPY_AFTER_BUILD=FALSE -DGITHUB_ACTIONS_BUILD=TRUE
-          cmake --build ./build --config Release --target six-sines_all --parallel 3
+          cmake --build ./build --config Release --target sapphire-plugins_all --parallel 3
 
       - name: Make windows zip
         if: github.event_name != 'pull_request' && runner.os == 'Windows'
@@ -69,26 +69,26 @@ jobs:
           ls -al
           popd
           
-          7z a -r build/inst/six-sines-windows-`date +"%Y-%m-%d"`-`git rev-parse --short HEAD`.zip build/insttmp/*
+          7z a -r build/inst/sapphire-plugins-windows-`date +"%Y-%m-%d"`-`git rev-parse --short HEAD`.zip build/insttmp/*
 
       - name: Make linux tgz
         if: github.event_name != 'pull_request' && runner.os == 'Linux'
         run: |
-          find build -name "Six Sines*" -print
+          find build -name "Sapphire*" -print
 
           mkdir build/inst
           mkdir build/insttmp
 
           mv build/*.clap build/insttmp
-          mv "build/Six Sines" build/insttmp
+          mv "build/Sapphire" build/insttmp
           mv build/Release/*.vst3 build/insttmp
 
-          find build -name "Six Sines*" -print
+          find build -name "Sapphire*" -print
 
           cd build/insttmp
           ls -al
 
-          tar cvzf ../inst/six-sines-linux-`date +"%Y-%m-%d"`-`git rev-parse --short HEAD`.tgz .
+          tar cvzf ../inst/sapphire-plugins-linux-`date +"%Y-%m-%d"`-`git rev-parse --short HEAD`.tgz .
 
 
       - name: Make Mac
@@ -104,7 +104,7 @@ jobs:
           
           mkdir build/inst
           cd build
-          ../libs/sst/sst-plugininfra/scripts/installer_mac/make_installer.sh "Six Sines" . ../resources/mac_installer inst `date +"%Y-%m-%d"`-`git rev-parse --short HEAD`
+          ../libs/sst/sst-plugininfra/scripts/installer_mac/make_installer.sh "Sapphire" . ../resources/mac_installer inst `date +"%Y-%m-%d"`-`git rev-parse --short HEAD`
 
           codesign -d --entitlement - installer-tmp/APP/Six\ Sines.app
 
@@ -116,11 +116,11 @@ jobs:
       - name: Build pull request version
         if: github.event_name == 'pull_request'
         run: |
-          cmake --build ./build --config Debug --target six-sines_all --parallel 3
+          cmake --build ./build --config Debug --target sapphire-plugins_all --parallel 3
 
-      - name: Find all the six sines
+      - name: Find all the Sapphire
         run: |
-          find build -name "Six Sines*" -print
+          find build -name "Sapphire*" -print
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -147,7 +147,7 @@ jobs:
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK }}
           tag: Nightly
-          title: "A New Six Sines Nightly is Available"
+          title: "A New Sapphire Nightly is Available"
           subtitle: "Have fun!"
 
   publish-plugin-release:
@@ -169,5 +169,5 @@ jobs:
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK }}
           tag: ${{ github.ref_name }}
-          title: "A New Six Sines Release is Available"
+          title: "A New Sapphire Release is Available"
           subtitle: "But really, what does stable mean?"
