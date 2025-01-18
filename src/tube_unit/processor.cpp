@@ -60,7 +60,7 @@ const clap_plugin_descriptor *getDescriptor()
     return &desc;
 }
 
-struct ElastikaClap : public plugHelper_t, sst::clap_juce_shim::EditorProvider
+struct TubeUnitClap : public plugHelper_t, sst::clap_juce_shim::EditorProvider
 {
     std::unique_ptr<Sapphire::TubeUnitEngine> engine;
     Patch patch;
@@ -68,7 +68,7 @@ struct ElastikaClap : public plugHelper_t, sst::clap_juce_shim::EditorProvider
     static constexpr double smoothingMilis{5};
     size_t blockPos{0};
 
-    ElastikaClap(const clap_host *h) : plugHelper_t(getDescriptor(), h)
+    TubeUnitClap(const clap_host *h) : plugHelper_t(getDescriptor(), h)
     {
         engine = std::make_unique<Sapphire::TubeUnitEngine>();
 
@@ -299,7 +299,7 @@ struct ElastikaClap : public plugHelper_t, sst::clap_juce_shim::EditorProvider
 
 const clap_plugin *makePlugin(const clap_host *h)
 {
-    auto res = new ElastikaClap(h);
+    auto res = new TubeUnitClap(h);
     return res->clapPlugin();
 }
 
