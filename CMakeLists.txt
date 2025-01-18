@@ -66,7 +66,9 @@ target_link_libraries(${PROJECT_NAME}-impl PRIVATE
         sst-plugininfra::strnatcmp
         sst-plugininfra::patchbase
         sst-plugininfra::version_information
+
         sst::clap_juce_shim sst::clap_juce_shim_headers
+        juce::juce_gui_basics
 )
 
 make_clapfirst_plugins(

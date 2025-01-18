@@ -11,6 +11,7 @@
 
 #include "sst/plugininfra/version_information.h"
 #include "sst/plugininfra/patch-support/patch_base_clap_adapter.h"
+#include "sst/cpputils/ring_buffer.h"
 
 #include "configuration.h"
 #include <clap/clap.h>
@@ -67,9 +68,17 @@ struct ElastikaClap : public plugHelper_t, sst::clap_juce_shim::EditorProvider
     ElastikaClap(const clap_host *h) : plugHelper_t(getDescriptor(), h)
     {
         engine = std::make_unique<Sapphire::ElastikaEngine>();
+
+        clapJuceShim = std::make_unique<sst::clap_juce_shim::ClapJuceShim>(this);
+        clapJuceShim->setResizable(false);
     }
 
     double sampleRate{0};
+
+    audioToUIQueue_t audioToUi;
+    uiToAudioQueue_T uiToAudio;
+    std::atomic<bool> doFullRefresh{false};
+    bool isEditorAttached{false};
 
   protected:
     bool init() noexcept override { return true; }
@@ -235,20 +244,16 @@ struct ElastikaClap : public plugHelper_t, sst::clap_juce_shim::EditorProvider
     }
 
   public:
-    bool implementsGui() const noexcept override
-    {
-        return false;
-    } // return clapJuceShim != nullptr; }
+    bool implementsGui() const noexcept override { return clapJuceShim != nullptr; }
     std::unique_ptr<sst::clap_juce_shim::ClapJuceShim> clapJuceShim;
     ADD_SHIM_IMPLEMENTATION(clapJuceShim)
     ADD_SHIM_LINUX_TIMER(clapJuceShim)
     std::unique_ptr<juce::Component> createEditor() override
     {
-        /* auto res = std::make_unique<baconpaul::six_sines::ui::SixSinesEditor>(
-            engine->audioToUi, engine->uiToAudio, [this]() { _host.paramsRequestFlush(); });
-        res->clapHost = _host.host();
-        return res; */
-        return nullptr;
+        auto res = std::make_unique<ElastikaEditor>(audioToUi, uiToAudio,
+                                                    [this]() { _host.paramsRequestFlush(); });
+        // res->clapHost = _host.host();
+        return res;
     }
 
     bool registerOrUnregisterTimer(clap_id &id, int ms, bool reg) override
