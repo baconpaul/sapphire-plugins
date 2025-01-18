@@ -43,7 +43,7 @@ const clap_plugin_descriptor *getDescriptor()
 
     static clap_plugin_descriptor desc = {
         CLAP_VERSION,
-        "org.sapphire_plugin.elastika",
+        pluginId,
         "Elastika",
         "Sapphirel",
         "",
@@ -58,6 +58,7 @@ const clap_plugin_descriptor *getDescriptor()
 struct ElastikaClap : public plugHelper_t, sst::clap_juce_shim::EditorProvider
 {
     std::unique_ptr<Sapphire::ElastikaEngine> engine;
+    Patch patch;
 
     ElastikaClap(const clap_host *h) : plugHelper_t(getDescriptor(), h)
     {
@@ -107,6 +108,121 @@ struct ElastikaClap : public plugHelper_t, sst::clap_juce_shim::EditorProvider
         info->channel_count = 2;
         info->port_type = CLAP_PORT_STEREO;
         return true;
+    }
+
+    bool implementsState() const noexcept override { return true; }
+    bool stateSave(const clap_ostream *ostream) noexcept override
+    {
+        // engine->prepForStream();
+        auto ss = patch.toState();
+        auto c = ss.c_str();
+        auto s = ss.length() + 1; // write the null terminator
+        while (s > 0)
+        {
+            auto r = ostream->write(ostream, c, s);
+            if (r < 0)
+                return false;
+            s -= r;
+            c += r;
+        }
+        return true;
+    }
+    bool stateLoad(const clap_istream *istream) noexcept override
+    {
+        static constexpr uint32_t initSize = 1 << 16, chunkSize = 1 << 8;
+        std::vector<char> buffer;
+        buffer.resize(initSize);
+
+        int64_t rd{0};
+        int64_t totalRd{0};
+        auto bp = buffer.data();
+
+        while ((rd = istream->read(istream, bp, chunkSize)) > 0)
+        {
+            bp += rd;
+            totalRd += rd;
+            if (totalRd >= buffer.size() - chunkSize - 1)
+            {
+                buffer.resize(buffer.size() * 2);
+                bp = buffer.data() + totalRd;
+            }
+        }
+        buffer[totalRd] = 0;
+
+        if (totalRd == 0)
+        {
+            SPLLOG("Received stream size 0. Invalid state");
+            return false;
+        }
+
+        auto data = std::string(buffer.data());
+        patch.fromState(data);
+        // engine->postLoad();
+        _host.paramsRequestFlush();
+        return true;
+    }
+
+    bool implementsParams() const noexcept override { return true; }
+    uint32_t paramsCount() const noexcept override { return patch.params.size(); }
+    bool paramsInfo(uint32_t paramIndex, clap_param_info *info) const noexcept override
+    {
+        auto *param = patch.params[paramIndex];
+        auto &md = param->meta;
+        md.toClapParamInfo<CLAP_NAME_SIZE, clap_param_info_t>(info);
+        info->cookie = (void *)param;
+        return true;
+    }
+    bool paramsValue(clap_id paramId, double *value) noexcept override
+    {
+        *value = patch.paramMap[paramId]->value;
+        return true;
+    }
+    bool paramsValueToText(clap_id paramId, double value, char *display,
+                           uint32_t size) noexcept override
+    {
+        auto it = patch.paramMap.find(paramId);
+        if (it == patch.paramMap.end())
+        {
+            return false;
+        }
+        auto valdisp = it->second->meta.valueToString(value);
+        if (!valdisp.has_value())
+            return false;
+
+        strncpy(display, valdisp->c_str(), size);
+        display[size - 1] = 0;
+        return true;
+    }
+    bool paramsTextToValue(clap_id paramId, const char *display, double *value) noexcept override
+    {
+        auto it = patch.paramMap.find(paramId);
+        if (it == patch.paramMap.end())
+        {
+            return false;
+        }
+        std::string err;
+        auto val = it->second->meta.valueFromString(display, err);
+        if (!val.has_value())
+        {
+            return false;
+        }
+        *value = *val;
+        return true;
+    }
+    void paramsFlush(const clap_input_events *in, const clap_output_events *out) noexcept override
+    {
+#if 0
+        auto sz = in->size(in);
+
+        for (int i = 0; i < sz; ++i)
+        {
+            const clap_event_header_t *nextEvent{nullptr};
+            nextEvent = in->get(in, i);
+            handleEvent(nextEvent);
+        }
+
+        engine->processUIQueue(out);
+#endif
     }
 
   public:
