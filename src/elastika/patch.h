@@ -84,11 +84,15 @@ struct Patch : pats::PatchBase<Patch, Param>
         this->pushSingleParam(&inputTilt);
         this->pushSingleParam(&outputTilt);
 
-        resetToInit();
-        for (auto &[i, p] : paramMap)
+        onResetToInit = [](auto &patch)
         {
-            p->snap();
-        }
+            for (auto &[i, p] : patch.paramMap)
+            {
+                p->snap();
+            }
+        };
+
+        resetToInit();
     }
 
     void migratePatchFromVersion(uint32_t) {}
