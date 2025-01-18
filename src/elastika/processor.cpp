@@ -59,6 +59,9 @@ struct ElastikaClap : public plugHelper_t, sst::clap_juce_shim::EditorProvider
 {
     std::unique_ptr<Sapphire::ElastikaEngine> engine;
     Patch patch;
+    static constexpr size_t smoothingBlock{8};
+    static constexpr double smoothingMilis{5};
+    size_t blockPos{0};
 
     ElastikaClap(const clap_host *h) : plugHelper_t(getDescriptor(), h)
     {
@@ -73,17 +76,55 @@ struct ElastikaClap : public plugHelper_t, sst::clap_juce_shim::EditorProvider
                   uint32_t maxFrameCount) noexcept override
     {
         this->sampleRate = sampleRate;
+        for (auto &[id, p] : patch.paramMap)
+            p->lag.setRateInMilliseconds(smoothingMilis, sampleRate, smoothingBlock);
         return true;
     }
     void deactivate() noexcept override {}
     clap_process_status process(const clap_process *process) noexcept override
     {
+        auto ev = process->in_events;
+        auto outq = process->out_events;
+        auto sz = ev->size(ev);
+
         float **in = process->audio_inputs[0].data32;
         float **out = process->audio_outputs[0].data32;
 
+        const clap_event_header_t *nextEvent{nullptr};
+        uint32_t nextEventIndex{0};
+        if (sz != 0)
+        {
+            nextEvent = ev->get(ev, nextEventIndex);
+        }
+
         for (auto s = 0U; s < process->frames_count; ++s)
         {
+            while (nextEvent && nextEvent->time <= s)
+            {
+                handleEvent(nextEvent);
+                nextEventIndex++;
+                if (nextEventIndex < sz)
+                    nextEvent = ev->get(ev, nextEventIndex);
+                else
+                    nextEvent = nullptr;
+            }
+
+            if (blockPos == 0)
+            {
+                for (auto &[i, p] : patch.paramMap)
+                    p->lag.process();
+                engine->setFriction(patch.friction.lag.v);
+                engine->setStiffness(patch.stiffness.lag.v);
+                engine->setSpan(patch.span.lag.v);
+                engine->setCurl(patch.curl.lag.v);
+                engine->setMass(patch.mass.lag.v);
+                engine->setDrive(patch.drive.lag.v);
+                engine->setGain(patch.level.lag.v);
+                engine->setInputTilt(patch.inputTilt.lag.v);
+                engine->setOutputTilt(patch.outputTilt.lag.v);
+            }
             engine->process(sampleRate, in[0][s], in[1][s], out[0][s], out[1][s]);
+            blockPos = (blockPos + 1) & (smoothingBlock - 1);
         }
 
         return CLAP_PROCESS_CONTINUE;
@@ -157,6 +198,10 @@ struct ElastikaClap : public plugHelper_t, sst::clap_juce_shim::EditorProvider
 
         auto data = std::string(buffer.data());
         patch.fromState(data);
+
+        for (auto &[id, p] : patch.paramMap)
+            p->snap();
+
         // engine->postLoad();
         _host.paramsRequestFlush();
         return true;
@@ -211,7 +256,6 @@ struct ElastikaClap : public plugHelper_t, sst::clap_juce_shim::EditorProvider
     }
     void paramsFlush(const clap_input_events *in, const clap_output_events *out) noexcept override
     {
-#if 0
         auto sz = in->size(in);
 
         for (int i = 0; i < sz; ++i)
@@ -221,8 +265,34 @@ struct ElastikaClap : public plugHelper_t, sst::clap_juce_shim::EditorProvider
             handleEvent(nextEvent);
         }
 
-        engine->processUIQueue(out);
-#endif
+        // engine->processUIQueue(out);
+    }
+
+    bool handleEvent(const clap_event_header_t *nextEvent)
+    {
+        if (nextEvent->space_id == CLAP_CORE_EVENT_SPACE_ID)
+        {
+            switch (nextEvent->type)
+            {
+            case CLAP_EVENT_PARAM_VALUE:
+            {
+                auto pevt = reinterpret_cast<const clap_event_param_value *>(nextEvent);
+                auto pid = pevt->param_id;
+                ;
+                auto p = patch.paramMap.at(pid);
+
+                p->value = pevt->value;
+                p->lag.setTarget(pevt->value);
+
+                // AudioToUIMsg au = {AudioToUIMsg::UPDATE_PARAM, pid, value};
+                // audioToUi.push(au);
+            }
+            break;
+            default:
+                break;
+            }
+        }
+        return true;
     }
 
   public:

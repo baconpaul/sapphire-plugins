@@ -18,6 +18,7 @@
 #include "elastika.h"
 #include "sst/cpputils/constructors.h"
 #include "sst/basic-blocks/params/ParamMetadata.h"
+#include "sst/basic-blocks/dsp/Lag.h"
 #include "sst/plugininfra/patch-support/patch_base.h"
 
 namespace sapphire_plugins::elastika
@@ -34,6 +35,9 @@ struct Param : pats::ParamBase
         value = val;
         return *this;
     }
+
+    sst::basic_blocks::dsp::OnePoleLag<float, true> lag;
+    void snap() { lag.snapTo(value); }
 };
 
 struct Patch : pats::PatchBase<Patch, Param>
@@ -79,6 +83,12 @@ struct Patch : pats::PatchBase<Patch, Param>
         this->pushSingleParam(&level);
         this->pushSingleParam(&inputTilt);
         this->pushSingleParam(&outputTilt);
+
+        resetToInit();
+        for (auto &[i, p] : paramMap)
+        {
+            p->snap();
+        }
     }
 
     void migratePatchFromVersion(uint32_t) {}
