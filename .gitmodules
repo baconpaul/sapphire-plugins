@@ -1,0 +1,33 @@
+[submodule "libs/sst/sst-basic-blocks"]
+	path = libs/sst/sst-basic-blocks
+	url = https://github.com/surge-synthesizer/sst-basic-blocks.git
+[submodule "libs/sst/sst-plugininfra"]
+	path = libs/sst/sst-plugininfra
+	url = https://github.com/surge-synthesizer/sst-plugininfra.git
+[submodule "libs/sst/sst-cpputils"]
+	path = libs/sst/sst-cpputils
+	url = https://github.com/surge-synthesizer/sst-cpputils.git
+[submodule "libs/clap/clap"]
+	path = libs/clap-libs/clap
+	url = https://github.com/free-audio/clap.git
+[submodule "libs/clap/clap-helpers"]
+	path = libs/clap-libs/clap-helpers
+	url = https://github.com/free-audio/clap-helpers.git
+[submodule "libs/clap/clap-wrapper"]
+	path = libs/clap-libs/clap-wrapper
+	url = https://github.com/free-audio/clap-wrapper.git
+[submodule "libs/fmt"]
+	path = libs/fmt
+	url = https://github.com/fmtlib/fmt.git
+[submodule "libs/simde"]
+	path = libs/simde
+	url = https://github.com/simd-everywhere/simde
+[submodule "libs/JUCE"]
+	path = libs/JUCE
+	url = https://github.com/juce-framework/JUCE.git
+[submodule "libs/sapphire"]
+	path = libs/sapphire
+	url = https://github.com/cosinekitty/sapphire.git
+[submodule "libs/sst/sst-clap-helpers"]
+	path = libs/sst/sst-clap-helpers
+	url = https://github.com/surge-synthesizer/sst-clap-helpers

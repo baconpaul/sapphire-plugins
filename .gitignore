@@ -1,0 +1,7 @@
+build/
+.DS_Store
+.idea/
+cmake-*/
+ignore/
+minst*.sh
+BUILD_VERSION
