@@ -54,6 +54,7 @@ add_library(${PROJECT_NAME}-impl STATIC
         src/elastika/editor.cpp
 
         src/shared/graphics_resources.cpp
+        src/shared/sapphire_lnf.cpp
 )
 target_include_directories(${PROJECT_NAME}-impl PUBLIC src)
 target_compile_definitions(${PROJECT_NAME}-impl PRIVATE

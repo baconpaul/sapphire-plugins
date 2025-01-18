@@ -47,23 +47,12 @@ using uiToAudioQueue_T = sst::cpputils::SimpleRingBuffer<UIToAudioMsg, 1024 * 64
 struct ElastikaEditor : public juce::Component
 {
     ElastikaEditor(audioToUIQueue_t &atou, uiToAudioQueue_T &utoa,
-                   std::function<void()> flushOperator)
-    {
-        setSize(600, 200);
-        loadGraphicsResources();
-    }
+                   std::function<void()> flushOperator);
 
-    void loadGraphicsResources();
+    std::unique_ptr<juce::Drawable> background;
 
-    void paint(juce::Graphics &g) override
-    {
-        g.fillAll(juce::Colours::orchid);
-        g.setFont(juce::FontOptions(40));
-        g.setColour(juce::Colours::white);
-        g.drawText("Elastika", getLocalBounds().translated(1, 1), juce::Justification::centred);
-        g.setColour(juce::Colours::black);
-        g.drawText("Elastika", getLocalBounds(), juce::Justification::centred);
-    }
+    void paint(juce::Graphics &g) override;
+    void resized() override;
 };
 } // namespace sapphire_plugins::elastika
 #endif
