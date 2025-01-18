@@ -47,25 +47,20 @@ const clap_plugin *clap_create_plugin(const clap_plugin_factory *f, const clap_h
     return nullptr;
 }
 
-/*
- * Clap Wrapper AUV2 Factory API
- */
-
 static bool clap_get_auv2_info(const clap_plugin_factory_as_auv2 *factory, uint32_t index,
                                clap_plugin_info_as_auv2_t *info)
 {
-    if (index != 0)
-        return false;
+    if (index == 0)
+    {
+        strncpy(info->au_type, "aumu", 5); // use the features to determine the type
+        strncpy(info->au_subt, "elas", 5);
 
-    strncpy(info->au_type, "aumu", 5); // use the features to determine the type
-    strncpy(info->au_subt, "elas", 5);
+        return true;
+    }
 
-    return true;
+    return false;
 }
 
-/*
- * Clap Wrapper VST3 Factory API
- */
 static const clap_plugin_info_as_vst3 *clap_get_vst3_info(const clap_plugin_factory_as_vst3 *f,
                                                           uint32_t index)
 {
@@ -95,7 +90,7 @@ const void *get_factory(const char *factory_id)
     if (strcmp(factory_id, CLAP_PLUGIN_FACTORY_INFO_VST3) == 0)
     {
         static const struct clap_plugin_factory_as_vst3 six_sines_vst3_factory = {
-            "BaconPaul", "https://baconpaul.org", "", clap_get_vst3_info};
+            "Sapphire", "", "", clap_get_vst3_info};
 
         return &six_sines_vst3_factory;
     }
@@ -104,7 +99,7 @@ const void *get_factory(const char *factory_id)
 bool clap_init(const char *p)
 {
     // sst::plugininfra::misc_platform::allocateConsole();
-    SPLLOG("Initializing Six Sines");
+    SPLLOG("Initializing Sapphire");
     return true;
 }
 void clap_deinit() {}
