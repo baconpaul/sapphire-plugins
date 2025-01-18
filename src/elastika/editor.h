@@ -40,9 +40,6 @@ struct ElastikaEditor : public juce::Component
     void idle();
     std::unique_ptr<juce::Timer> idleTimer;
 
-    std::unique_ptr<juce::Slider> make_large_knob(const std::string &pos);
-    std::unique_ptr<juce::Slider> make_slider(const std::string &pos);
-
     std::unique_ptr<juce::Drawable> background;
     std::unique_ptr<juce::Slider> input_tilt_knob;
     std::unique_ptr<juce::Slider> output_tilt_knob;

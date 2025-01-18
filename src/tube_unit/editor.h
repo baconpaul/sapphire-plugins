@@ -24,36 +24,23 @@
 
 namespace sapphire_plugins::tube_unit
 {
-struct ElastikaEditor : public juce::Component
+struct TubeUnitEditor : public juce::Component
 {
     Patch patchCopy;
 
-    ElastikaEditor(shared::audioToUIQueue_t &atou, shared::uiToAudioQueue_T &utoa,
+    TubeUnitEditor(shared::audioToUIQueue_t &atou, shared::uiToAudioQueue_T &utoa,
                    std::function<void()> flushOperator);
-    ~ElastikaEditor();
+    ~TubeUnitEditor();
 
-    void bindSlider(const std::unique_ptr<juce::Slider> &slider, Param &p);
     std::unordered_map<uint32_t, juce::Component::SafePointer<juce::Slider>> sliderByID;
 
     void resized() override;
-
     void idle();
     std::unique_ptr<juce::Timer> idleTimer;
 
-    std::unique_ptr<juce::Slider> make_large_knob(const std::string &pos);
-    std::unique_ptr<juce::Slider> make_slider(const std::string &pos);
-
     std::unique_ptr<juce::Drawable> background;
-    std::unique_ptr<juce::Slider> input_tilt_knob;
-    std::unique_ptr<juce::Slider> output_tilt_knob;
-    std::unique_ptr<juce::Slider> drive_knob;
-    std::unique_ptr<juce::Slider> level_knob;
-
-    std::unique_ptr<juce::Slider> fric_slider;
-    std::unique_ptr<juce::Slider> mass_slider;
-    std::unique_ptr<juce::Slider> stif_slider;
-    std::unique_ptr<juce::Slider> span_slider;
-    std::unique_ptr<juce::Slider> curl_slider;
+    std::unique_ptr<juce::Slider> airflow, bypassWidth, bypassCenter, reflectionDecay,
+        reflectionAngle, rootFrequency, stiffness;
 
     std::unique_ptr<shared::LookAndFeel> lnf;
 

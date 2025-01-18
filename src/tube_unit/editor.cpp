@@ -40,12 +40,12 @@ void set_control_position(juce::Component &control, float cx, float cy, float dx
 
 struct IdleTimer : juce::Timer
 {
-    ElastikaEditor &editor;
-    IdleTimer(ElastikaEditor &e) : editor(e) {}
+    TubeUnitEditor &editor;
+    IdleTimer(TubeUnitEditor &e) : editor(e) {}
     void timerCallback() override { editor.idle(); }
 };
 
-ElastikaEditor::ElastikaEditor(shared::audioToUIQueue_t &atou, shared::uiToAudioQueue_T &utoa,
+TubeUnitEditor::TubeUnitEditor(shared::audioToUIQueue_t &atou, shared::uiToAudioQueue_T &utoa,
                                std::function<void()> flushOperator)
     : audioToUI(atou), uiToAudio(utoa), flushOperator(flushOperator)
 {
@@ -58,7 +58,7 @@ ElastikaEditor::ElastikaEditor(shared::audioToUIQueue_t &atou, shared::uiToAudio
     lnf = std::make_unique<shared::LookAndFeel>(juce::Drawable::createFromSVG(*knob_xml),
                                                 juce::Drawable::createFromSVG(*marker_xml));
 
-    auto bg = shared::getSvgForPath("libs/sapphire/res/elastika.svg");
+    auto bg = shared::getSvgForPath("libs/sapphire/res/tubeunit.svg");
     if (bg.has_value())
     {
         auto bgx = juce::XmlDocument::parse(*bg);
@@ -71,6 +71,10 @@ ElastikaEditor::ElastikaEditor(shared::audioToUIQueue_t &atou, shared::uiToAudio
         }
     }
 
+    airflow = shared::makeLargeKnob(this, "tube_unit", "airflow_knob");
+    shared::set_control_position(*airflow, 15, 15, 0.5, 0.5);
+    shared::bindSlider(this, airflow, patchCopy.airflow);
+#if 0
     input_tilt_knob = make_large_knob("input_tilt_knob");
     shared::bindSlider(this, input_tilt_knob, patchCopy.inputTilt);
 
@@ -97,6 +101,7 @@ ElastikaEditor::ElastikaEditor(shared::audioToUIQueue_t &atou, shared::uiToAudio
 
     stif_slider = make_slider("stif_slider");
     shared::bindSlider(this, stif_slider, patchCopy.stiffness);
+#endif
 
     setSize(300, 600);
     resized();
@@ -107,13 +112,13 @@ ElastikaEditor::ElastikaEditor(shared::audioToUIQueue_t &atou, shared::uiToAudio
     uiToAudio.push({shared::UIToAudioMsg::EDITOR_ATTACH_DETATCH, true});
 }
 
-ElastikaEditor::~ElastikaEditor()
+TubeUnitEditor::~TubeUnitEditor()
 {
     uiToAudio.push({shared::UIToAudioMsg::EDITOR_ATTACH_DETATCH, false});
     idleTimer->stopTimer();
 }
 
-void ElastikaEditor::resized()
+void TubeUnitEditor::resized()
 {
     if (background)
     {
@@ -121,59 +126,6 @@ void ElastikaEditor::resized()
     }
 }
 
-void ElastikaEditor::idle() { shared::drainQueueFromUI(*this); }
-
-std::unique_ptr<juce::Slider> ElastikaEditor::make_large_knob(const std::string &pos)
-{
-    auto r = Sapphire::FindComponent("elastika", pos);
-    auto cx = r.cx;
-    auto cy = r.cy;
-
-    static constexpr float dx = 0.5f;
-    static constexpr float dy = 0.5f;
-    auto kn = std::make_unique<juce::Slider>();
-    kn->setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
-    kn->setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
-    kn->setPopupMenuEnabled(true);
-    kn->setSize(11, 11);
-    kn->setRange(0, 1);
-    kn->setValue(0.5);
-    kn->setMouseDragSensitivity(100);
-    kn->setDoubleClickReturnValue(true, 0.5);
-    kn->setLookAndFeel(lnf.get());
-
-    background->addAndMakeVisible(*kn);
-    set_control_position(*kn, cx, cy, dx, dy);
-
-    return kn;
-}
-
-std::unique_ptr<juce::Slider> ElastikaEditor::make_slider(const std::string &pos)
-{
-    auto r = Sapphire::FindComponent("elastika", pos);
-    auto cx = r.cx;
-    auto cy = r.cy;
-
-    static constexpr float dx = 0.6875f;
-    static constexpr float dy = 0.6875f;
-    auto sl = std::make_unique<juce::Slider>();
-    sl->setSliderStyle(juce::Slider::LinearVertical);
-    sl->setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
-    sl->setSize(8, 28);
-    sl->setMouseDragSensitivity(28);
-    sl->setRange(0, 1);
-    sl->setValue(0.5);
-    sl->setDoubleClickReturnValue(true, 0.5);
-    sl->setLookAndFeel(lnf.get());
-    // TODO: Get the "snap to mouse position" to work with the scaling we have where we only use 90%
-    // of the track (the remaining 10% is for the bottom part of the thumb; the thumb's "position"
-    // is the very top pixel of the thumb). Until then, it doesn't work right throughout the whole
-    // track, so we set this to false.
-    sl->setSliderSnapsToMousePosition(false);
-
-    background->addAndMakeVisible(*sl);
-    set_control_position(*sl, cx, cy, dx, dy);
-    return sl;
-}
+void TubeUnitEditor::idle() { shared::drainQueueFromUI(*this); }
 
 } // namespace sapphire_plugins::tube_unit

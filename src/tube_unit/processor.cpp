@@ -72,8 +72,8 @@ struct ElastikaClap : public plugHelper_t, sst::clap_juce_shim::EditorProvider
     {
         engine = std::make_unique<Sapphire::TubeUnitEngine>();
 
-        // clapJuceShim = std::make_unique<sst::clap_juce_shim::ClapJuceShim>(this);
-        // clapJuceShim->setResizable(false);
+        clapJuceShim = std::make_unique<sst::clap_juce_shim::ClapJuceShim>(this);
+        clapJuceShim->setResizable(false);
     }
 
     double sampleRate{0};
@@ -267,19 +267,18 @@ struct ElastikaClap : public plugHelper_t, sst::clap_juce_shim::EditorProvider
         }
     }
 
-    bool implementsGui() const noexcept override { return false; /*clapJuceShim != nullptr;*/ }
+    bool implementsGui() const noexcept override { return clapJuceShim != nullptr; }
     std::unique_ptr<sst::clap_juce_shim::ClapJuceShim> clapJuceShim;
     ADD_SHIM_IMPLEMENTATION(clapJuceShim)
     ADD_SHIM_LINUX_TIMER(clapJuceShim)
     std::unique_ptr<juce::Component> createEditor() override
     {
-        // pushFullUIRefresh();
-        // auto res = std::make_unique<ElastikaEditor>(audioToUi, uiToAudio,
-        //                                                    [this]() { _host.paramsRequestFlush();
-        //                                                    });
+        pushFullUIRefresh();
+        auto res = std::make_unique<TubeUnitEditor>(audioToUi, uiToAudio,
+                                                    [this]() { _host.paramsRequestFlush(); });
         // res->clapHost = _host.host();
 
-        return nullptr;
+        return res;
     }
 
     bool registerOrUnregisterTimer(clap_id &id, int ms, bool reg) override

@@ -15,6 +15,8 @@
 #ifndef SAPPHIRE_PLUGINS_SHARED_EDITOR_INTERACTIONS_H
 #define SAPPHIRE_PLUGINS_SHARED_EDITOR_INTERACTIONS_H
 
+#include "sapphire_panel.hpp"
+
 namespace sapphire_plugins::shared
 {
 
@@ -175,6 +177,70 @@ void bindSlider(Editor *editor, const std::unique_ptr<juce::Slider> &slider, Par
     editor->sliderByID[p.meta.id] = juce::Component::SafePointer<juce::Slider>(slider.get());
 }
 
+inline void set_control_position(juce::Component &control, float cx, float cy, float dx, float dy)
+{
+    juce::Point<float> real{cx + dx, cy + dy};
+    juce::Point<int> rounded = real.toInt();
+    control.setCentrePosition(rounded);
+    control.setTransform(juce::AffineTransform::translation(real.getX() - rounded.getX(),
+                                                            real.getY() - rounded.getY()));
+}
+template <typename Editor>
+std::unique_ptr<juce::Slider> makeLargeKnob(Editor *editor, const std::string &prefix,
+                                            const std::string pos)
+{
+    auto r = Sapphire::FindComponent(prefix, pos);
+    auto cx = r.cx;
+    auto cy = r.cy;
+
+    static constexpr float dx = 0.5f;
+    static constexpr float dy = 0.5f;
+    auto kn = std::make_unique<juce::Slider>();
+    kn->setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    kn->setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
+    kn->setPopupMenuEnabled(true);
+    kn->setSize(11, 11);
+    kn->setRange(0, 1);
+    kn->setValue(0.5);
+    kn->setMouseDragSensitivity(100);
+    kn->setDoubleClickReturnValue(true, 0.5);
+    kn->setLookAndFeel(editor->lnf.get());
+
+    editor->background->addAndMakeVisible(*kn);
+    set_control_position(*kn, cx, cy, dx, dy);
+
+    return kn;
+}
+
+template <typename Editor>
+std::unique_ptr<juce::Slider> makeSlider(Editor *editor, const std::string &prefix,
+                                         const std::string pos)
+{
+    auto r = Sapphire::FindComponent(prefix, pos);
+    auto cx = r.cx;
+    auto cy = r.cy;
+
+    static constexpr float dx = 0.6875f;
+    static constexpr float dy = 0.6875f;
+    auto sl = std::make_unique<juce::Slider>();
+    sl->setSliderStyle(juce::Slider::LinearVertical);
+    sl->setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
+    sl->setSize(8, 28);
+    sl->setMouseDragSensitivity(28);
+    sl->setRange(0, 1);
+    sl->setValue(0.5);
+    sl->setDoubleClickReturnValue(true, 0.5);
+    sl->setLookAndFeel(editor->lnf.get());
+    // TODO: Get the "snap to mouse position" to work with the scaling we have where we only use 90%
+    // of the track (the remaining 10% is for the bottom part of the thumb; the thumb's "position"
+    // is the very top pixel of the thumb). Until then, it doesn't work right throughout the whole
+    // track, so we set this to false.
+    sl->setSliderSnapsToMousePosition(false);
+
+    editor->background->addAndMakeVisible(*sl);
+    set_control_position(*sl, cx, cy, dx, dy);
+    return sl;
+}
 } // namespace sapphire_plugins::shared
 
 #endif // EDITOR_INTERACTIONS_H

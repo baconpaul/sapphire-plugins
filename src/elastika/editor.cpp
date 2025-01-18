@@ -22,22 +22,6 @@
 namespace sapphire_plugins::elastika
 {
 
-// Helper function for placing a control exactly. Juce positioning doesn't take subpixel locations,
-// unlike the rest of Juce. So apply a rounded version of that and add a transform that shunts it to
-// the exact right location.
-//
-// cx and cy are the coordinates from the SVG. These are, for whatever reason, slightly off when
-// used on top of our background. dx and dy are the correction for that off-ness (determined
-// experimentally).
-void set_control_position(juce::Component &control, float cx, float cy, float dx, float dy)
-{
-    juce::Point<float> real{cx + dx, cy + dy};
-    juce::Point<int> rounded = real.toInt();
-    control.setCentrePosition(rounded);
-    control.setTransform(juce::AffineTransform::translation(real.getX() - rounded.getX(),
-                                                            real.getY() - rounded.getY()));
-}
-
 struct IdleTimer : juce::Timer
 {
     ElastikaEditor &editor;
@@ -71,31 +55,31 @@ ElastikaEditor::ElastikaEditor(shared::audioToUIQueue_t &atou, shared::uiToAudio
         }
     }
 
-    input_tilt_knob = make_large_knob("input_tilt_knob");
+    input_tilt_knob = shared::makeLargeKnob(this, "elastika", "input_tilt_knob");
     shared::bindSlider(this, input_tilt_knob, patchCopy.inputTilt);
 
-    output_tilt_knob = make_large_knob("output_tilt_knob");
+    output_tilt_knob = shared::makeLargeKnob(this, "elastika", "output_tilt_knob");
     shared::bindSlider(this, output_tilt_knob, patchCopy.outputTilt);
 
-    drive_knob = make_large_knob("drive_knob");
+    drive_knob = shared::makeLargeKnob(this, "elastika", "drive_knob");
     shared::bindSlider(this, drive_knob, patchCopy.drive);
 
-    level_knob = make_large_knob("level_knob");
+    level_knob = shared::makeLargeKnob(this, "elastika", "level_knob");
     shared::bindSlider(this, level_knob, patchCopy.level);
 
-    fric_slider = make_slider("fric_slider");
+    fric_slider = shared::makeSlider(this, "elastika", "fric_slider");
     shared::bindSlider(this, fric_slider, patchCopy.friction);
 
-    curl_slider = make_slider("curl_slider");
+    curl_slider = shared::makeSlider(this, "elastika", "curl_slider");
     shared::bindSlider(this, curl_slider, patchCopy.curl);
 
-    span_slider = make_slider("span_slider");
+    span_slider = shared::makeSlider(this, "elastika", "span_slider");
     shared::bindSlider(this, span_slider, patchCopy.span);
 
-    mass_slider = make_slider("mass_slider");
+    mass_slider = shared::makeSlider(this, "elastika", "mass_slider");
     shared::bindSlider(this, mass_slider, patchCopy.mass);
 
-    stif_slider = make_slider("stif_slider");
+    stif_slider = shared::makeSlider(this, "elastika", "stif_slider");
     shared::bindSlider(this, stif_slider, patchCopy.stiffness);
 
     setSize(300, 600);
@@ -122,58 +106,5 @@ void ElastikaEditor::resized()
 }
 
 void ElastikaEditor::idle() { shared::drainQueueFromUI(*this); }
-
-std::unique_ptr<juce::Slider> ElastikaEditor::make_large_knob(const std::string &pos)
-{
-    auto r = Sapphire::FindComponent("elastika", pos);
-    auto cx = r.cx;
-    auto cy = r.cy;
-
-    static constexpr float dx = 0.5f;
-    static constexpr float dy = 0.5f;
-    auto kn = std::make_unique<juce::Slider>();
-    kn->setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
-    kn->setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
-    kn->setPopupMenuEnabled(true);
-    kn->setSize(11, 11);
-    kn->setRange(0, 1);
-    kn->setValue(0.5);
-    kn->setMouseDragSensitivity(100);
-    kn->setDoubleClickReturnValue(true, 0.5);
-    kn->setLookAndFeel(lnf.get());
-
-    background->addAndMakeVisible(*kn);
-    set_control_position(*kn, cx, cy, dx, dy);
-
-    return kn;
-}
-
-std::unique_ptr<juce::Slider> ElastikaEditor::make_slider(const std::string &pos)
-{
-    auto r = Sapphire::FindComponent("elastika", pos);
-    auto cx = r.cx;
-    auto cy = r.cy;
-
-    static constexpr float dx = 0.6875f;
-    static constexpr float dy = 0.6875f;
-    auto sl = std::make_unique<juce::Slider>();
-    sl->setSliderStyle(juce::Slider::LinearVertical);
-    sl->setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
-    sl->setSize(8, 28);
-    sl->setMouseDragSensitivity(28);
-    sl->setRange(0, 1);
-    sl->setValue(0.5);
-    sl->setDoubleClickReturnValue(true, 0.5);
-    sl->setLookAndFeel(lnf.get());
-    // TODO: Get the "snap to mouse position" to work with the scaling we have where we only use 90%
-    // of the track (the remaining 10% is for the bottom part of the thumb; the thumb's "position"
-    // is the very top pixel of the thumb). Until then, it doesn't work right throughout the whole
-    // track, so we set this to false.
-    sl->setSliderSnapsToMousePosition(false);
-
-    background->addAndMakeVisible(*sl);
-    set_control_position(*sl, cx, cy, dx, dy);
-    return sl;
-}
 
 } // namespace sapphire_plugins::elastika
