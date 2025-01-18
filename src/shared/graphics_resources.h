@@ -9,17 +9,15 @@
  * The source code and license are at https://github.com/baconpaul/sapphire-plugins
  */
 
-#include "editor.h"
-#include "configuration.h"
-#include "shared/graphics_resources.h"
+#ifndef SAPPHIRE_PLUGINS_SHARED_GRAPHICS_RESOURCES_H
+#define SAPPHIRE_PLUGINS_SHARED_GRAPHICS_RESOURCES_H
 
-namespace sapphire_plugins::elastika
+#include <optional>
+#include <string>
+
+namespace sapphire_plugins::shared
 {
-void ElastikaEditor::loadGraphicsResources()
-{
-    auto bg = shared::getSvgForPath("libs/sapphire/res/elastika.svg");
-    if (bg.has_value())
-        SPLLOG(*bg);
+std::optional<std::string> getSvgForPath(const std::string &path);
 }
 
-} // namespace sapphire_plugins::elastika
+#endif // GRAPHICS_RESOURCES_H

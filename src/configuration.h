@@ -13,6 +13,8 @@
 #define SAPPHIRE_PLUGINS_CONFIGURATION_H
 
 #include <string>
+#include <iostream>
+#include <iomanip>
 
 #include "sst/plugininfra/version_information.h"
 

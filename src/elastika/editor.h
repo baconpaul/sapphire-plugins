@@ -50,7 +50,10 @@ struct ElastikaEditor : public juce::Component
                    std::function<void()> flushOperator)
     {
         setSize(600, 200);
+        loadGraphicsResources();
     }
+
+    void loadGraphicsResources();
 
     void paint(juce::Graphics &g) override
     {

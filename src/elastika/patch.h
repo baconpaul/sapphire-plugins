@@ -17,28 +17,16 @@
 #include "configuration.h"
 #include "elastika.h"
 #include "sst/cpputils/constructors.h"
-#include "sst/basic-blocks/params/ParamMetadata.h"
-#include "sst/basic-blocks/dsp/Lag.h"
 #include "sst/plugininfra/patch-support/patch_base.h"
+#include "shared/param_with_lag.h"
 
 namespace sapphire_plugins::elastika
 {
 namespace scpu = sst::cpputils;
 namespace pats = sst::plugininfra::patch_support;
 using md_t = sst::basic_blocks::params::ParamMetaData;
-struct Param : pats::ParamBase
-{
-    Param(const md_t &m) : pats::ParamBase(m) {}
 
-    Param &operator=(const float &val)
-    {
-        value = val;
-        return *this;
-    }
-
-    sst::basic_blocks::dsp::OnePoleLag<float, true> lag;
-    void snap() { lag.snapTo(value); }
-};
+using Param = shared::ParamWithLag;
 
 struct Patch : pats::PatchBase<Patch, Param>
 {
