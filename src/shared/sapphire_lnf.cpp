@@ -19,7 +19,7 @@ using juce::Colour;
 using juce::Point;
 using juce::Slider;
 
-namespace sapphire_plugin::shared
+namespace sapphire_plugins::shared
 {
 
 LookAndFeel::LookAndFeel(std::unique_ptr<juce::Drawable> knob,

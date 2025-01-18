@@ -17,6 +17,7 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 #include "sst/cpputils/ring_buffer.h"
+#include "shared/sapphire_lnf.h"
 
 namespace sapphire_plugins::elastika
 {
@@ -52,10 +53,21 @@ struct ElastikaEditor : public juce::Component
     ElastikaEditor(audioToUIQueue_t &atou, uiToAudioQueue_T &utoa,
                    std::function<void()> flushOperator);
 
-    std::unique_ptr<juce::Drawable> background;
 
-    void paint(juce::Graphics &g) override;
     void resized() override;
+
+    std::unique_ptr<juce::Slider> make_large_knob(const std::string &pos);
+
+    std::unique_ptr<juce::Drawable> background;
+    std::unique_ptr<juce::Slider> input_tilt_knob;
+    std::unique_ptr<juce::Component> junk;
+
+    std::unique_ptr<shared::LookAndFeel> lnf;
+    /*
+    audioToUIQueue_t &audioToUIQueue;
+    uiToAudioQueue_T &uiToAudioQueue;
+    std::function<void()> flushOperator;
+    */
 };
 } // namespace sapphire_plugins::elastika
 #endif

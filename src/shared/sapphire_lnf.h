@@ -17,7 +17,7 @@
 #include <memory>
 #include "juce_gui_basics/juce_gui_basics.h"
 
-namespace sapphire_plugin::shared
+namespace sapphire_plugins::shared
 {
 class LookAndFeel : public juce::LookAndFeel_V4
 {
