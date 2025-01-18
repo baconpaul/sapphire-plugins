@@ -9,9 +9,11 @@
  * The source code and license are at https://github.com/baconpaul/sapphire-plugins
  */
 
-namespace sapphire_plugins
+#include <clap/clap.h>
+
+namespace sapphire_plugins::elastika
 {
-const void *get_factory(const char *factory_id);
-bool clap_init(const char *p);
-void clap_deinit();
-} // namespace sapphire_plugins
+const clap_plugin *makePlugin(const clap_host *);
+const clap_plugin_descriptor *getDescriptor();
+
+} // namespace sapphire_plugins::elastika

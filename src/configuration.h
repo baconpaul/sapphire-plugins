@@ -1,13 +1,20 @@
-//
-// Created by Paul Walker on 1/17/25.
-//
+/*
+ * Sapphire Plugins
+ *
+ * Bringing the magical world of CosineKitty's sapphire plugins for rack to your DAW
+ *
+ * Copyright 2024-2025, Don Cross, Paul Walker and Various authors, as described in the github
+ * transaction log.
+ *
+ * The source code and license are at https://github.com/baconpaul/sapphire-plugins
+ */
 
-#ifndef CONFIGURATION_H
-#define CONFIGURATION_H
+#ifndef SAPPHIRE_PLUGINS_CONFIGURATION_H
+#define SAPPHIRE_PLUGINS_CONFIGURATION_H
 
 #include <string>
 
-#include "sst/plugininfra/version.h"
+#include "sst/plugininfra/version_information.h"
 
 inline std::string fileTrunc(const std::string &f)
 {
@@ -19,8 +26,8 @@ inline std::string fileTrunc(const std::string &f)
     return f;
 }
 
-#define SPLLOG(...)                                                                               \
-std::cout << fileTrunc(__FILE__) << ":" << __LINE__ << " " << __VA_ARGS__ << std::endl;
+#define SPLLOG(...)                                                                                \
+    std::cout << fileTrunc(__FILE__) << ":" << __LINE__ << " " << __VA_ARGS__ << std::endl;
 #define SPLV(x) " " << #x << "=" << x
 
-#endif //CONFIGURATION_H
+#endif // CONFIGURATION_H

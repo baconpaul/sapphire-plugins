@@ -31,6 +31,9 @@ add_subdirectory(libs)
 
 add_library(${PROJECT_NAME}-impl STATIC
         src/clap/sapphire-clap-entry-impl.cpp
+
+        src/elastika/processor.cpp
+        src/elastika/editor.cpp
 )
 target_include_directories(${PROJECT_NAME}-impl PUBLIC src)
 target_compile_definitions(${PROJECT_NAME}-impl PRIVATE

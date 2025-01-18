@@ -1,6 +1,15 @@
+/*
+ * Sapphire Plugins
+ *
+ * Bringing the magical world of CosineKitty's sapphire plugins for rack to your DAW
+ *
+ * Copyright 2024-2025, Don Cross, Paul Walker and Various authors, as described in the github
+ * transaction log.
+ *
+ * The source code and license are at https://github.com/baconpaul/sapphire-plugins
+ */
 
 #include "configuration.h"
-#include "sst/plugininfra/misc_platform.h"
 #include "sst/plugininfra/version_information.h"
 #include "clap/sapphire-clap-entry-impl.h"
 #include "clap/plugin.h"
@@ -12,42 +21,17 @@
 #include <string.h>
 #include <clap/clap.h>
 
+#include "elastika/elastika.h"
+
 namespace sapphire_plugins
 {
-
-extern const clap_plugin *makePlugin(const clap_host *);
-
-/*
- * Clap Factory API
- */
-const clap_plugin_descriptor *getDescriptor()
-{
-    static const char *features[] = {CLAP_PLUGIN_FEATURE_INSTRUMENT,
-                                     CLAP_PLUGIN_FEATURE_SYNTHESIZER, "Free and Open Source",
-                                     "Audio Rate Modulation", nullptr};
-
-    static char versionNum[1024];
-
-    static clap_plugin_descriptor desc = {
-        CLAP_VERSION,
-        "org.baconpaul.six-sines",
-        PRODUCT_NAME,
-        "BaconPaul",
-        "https://baconpaul.org",
-        "",
-        "",
-        sst::plugininfra::VersionInformation::project_version_and_hash,
-        "Synth with Audio Rate Modulation or something",
-        &features[0]};
-    return &desc;
-}
 
 uint32_t clap_get_plugin_count(const clap_plugin_factory *) { return 1; };
 const clap_plugin_descriptor *clap_get_plugin_descriptor(const clap_plugin_factory *f, uint32_t w)
 {
     if (w == 0)
     {
-        return getDescriptor();
+        return elastika::getDescriptor();
     }
 
     return nullptr;
@@ -56,10 +40,9 @@ const clap_plugin_descriptor *clap_get_plugin_descriptor(const clap_plugin_facto
 const clap_plugin *clap_create_plugin(const clap_plugin_factory *f, const clap_host *host,
                                       const char *plugin_id)
 {
-
-    if (strcmp(plugin_id, getDescriptor()->id) == 0)
+    if (strcmp(plugin_id, elastika::getDescriptor()->id) == 0)
     {
-        return makePlugin(host);
+        return elastika::makePlugin(host);
     }
     return nullptr;
 }
@@ -104,7 +87,7 @@ const void *get_factory(const char *factory_id)
     if (strcmp(factory_id, CLAP_PLUGIN_FACTORY_INFO_AUV2) == 0)
     {
         static const struct clap_plugin_factory_as_auv2 six_sines_auv2_factory = {
-            "SPhR",      // manu
+            "SPhR",    // manu
             "Saphire", // manu name
             clap_get_auv2_info};
         return &six_sines_auv2_factory;
@@ -125,4 +108,4 @@ bool clap_init(const char *p)
     return true;
 }
 void clap_deinit() {}
-} // na
+} // namespace sapphire_plugins
