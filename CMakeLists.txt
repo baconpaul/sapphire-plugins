@@ -53,6 +53,9 @@ add_library(${PROJECT_NAME}-impl STATIC
         src/elastika/processor.cpp
         src/elastika/editor.cpp
 
+        src/tube_unit/processor.cpp
+        #src/tube_unit/editor.cpp
+
         src/shared/graphics_resources.cpp
         src/shared/sapphire_lnf.cpp
 )

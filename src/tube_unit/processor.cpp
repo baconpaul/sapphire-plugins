@@ -27,12 +27,12 @@
 #include <memory>
 #include "sst/clap_juce_shim/clap_juce_shim.h"
 
-#include "elastika_engine.hpp"
-#include "elastika.h"
+#include "tubeunit_engine.hpp"
+#include "tube_unit.h"
 #include "patch.h"
 #include "editor.h"
 
-namespace sapphire_plugins::elastika
+namespace sapphire_plugins::tube_unit
 {
 
 static constexpr clap::helpers::MisbehaviourHandler misLevel =
@@ -49,7 +49,7 @@ const clap_plugin_descriptor *getDescriptor()
     static clap_plugin_descriptor desc = {
         CLAP_VERSION,
         pluginId,
-        "Elastika",
+        "Tube Unit",
         "Sapphire",
         "",
         "",
@@ -62,7 +62,7 @@ const clap_plugin_descriptor *getDescriptor()
 
 struct ElastikaClap : public plugHelper_t, sst::clap_juce_shim::EditorProvider
 {
-    std::unique_ptr<Sapphire::ElastikaEngine> engine;
+    std::unique_ptr<Sapphire::TubeUnitEngine> engine;
     Patch patch;
     static constexpr size_t smoothingBlock{8};
     static constexpr double smoothingMilis{5};
@@ -70,10 +70,10 @@ struct ElastikaClap : public plugHelper_t, sst::clap_juce_shim::EditorProvider
 
     ElastikaClap(const clap_host *h) : plugHelper_t(getDescriptor(), h)
     {
-        engine = std::make_unique<Sapphire::ElastikaEngine>();
+        engine = std::make_unique<Sapphire::TubeUnitEngine>();
 
-        clapJuceShim = std::make_unique<sst::clap_juce_shim::ClapJuceShim>(this);
-        clapJuceShim->setResizable(false);
+        // clapJuceShim = std::make_unique<sst::clap_juce_shim::ClapJuceShim>(this);
+        // clapJuceShim->setResizable(false);
     }
 
     double sampleRate{0};
@@ -88,6 +88,7 @@ struct ElastikaClap : public plugHelper_t, sst::clap_juce_shim::EditorProvider
                   uint32_t maxFrameCount) noexcept override
     {
         this->sampleRate = sampleRate;
+        engine->setSampleRate(sampleRate);
         for (auto &[id, p] : patch.paramMap)
             p->lag.setRateInMilliseconds(smoothingMilis, sampleRate, smoothingBlock);
         return true;
@@ -127,23 +128,26 @@ struct ElastikaClap : public plugHelper_t, sst::clap_juce_shim::EditorProvider
             {
                 for (auto &[i, p] : patch.paramMap)
                     p->lag.process();
-                engine->setFriction(patch.friction.lag.v);
-                engine->setStiffness(patch.stiffness.lag.v);
-                engine->setSpan(patch.span.lag.v);
-                engine->setCurl(patch.curl.lag.v);
-                engine->setMass(patch.mass.lag.v);
-                engine->setDrive(patch.drive.lag.v);
-                engine->setGain(patch.level.lag.v);
-                engine->setInputTilt(patch.inputTilt.lag.v);
-                engine->setOutputTilt(patch.outputTilt.lag.v);
+                engine->setAirflow(patch.airflow.lag.v);
+                engine->setVortex(patch.vortex.lag.v);
+                engine->setBypassWidth(patch.bypassWidth.lag.v);
+                engine->setBypassCenter(patch.bypassCenter.lag.v);
+                engine->setReflectionAngle(M_PI * patch.reflectionAngle.lag.v);
+                engine->setReflectionDecay(patch.reflectionDecay.lag.v);
+                engine->setRootFrequency(4 * std::pow(2.f, patch.rootFrequency.lag.v));
+                engine->setSpringConstant(0.005f * std::pow(10.0f, 4.0f * patch.stiffness.lag.v));
             }
-            engine->process(sampleRate, in[0][s], in[1][s], out[0][s], out[1][s]);
+            engine->process(out[0][s], out[1][s], in[0][s], in[1][s]);
             blockPos = (blockPos + 1) & (smoothingBlock - 1);
         }
 
         return CLAP_PROCESS_CONTINUE;
     }
-    void reset() noexcept override { engine->quiet(); }
+    void reset() noexcept override
+    {
+        engine->setQuiet(true);
+        engine->setQuiet(false);
+    }
 
     bool implementsAudioPorts() const noexcept override { return true; }
     uint32_t audioPortsCount(bool isInput) const noexcept override { return 1; }
@@ -263,18 +267,19 @@ struct ElastikaClap : public plugHelper_t, sst::clap_juce_shim::EditorProvider
         }
     }
 
-    bool implementsGui() const noexcept override { return clapJuceShim != nullptr; }
+    bool implementsGui() const noexcept override { return false; /*clapJuceShim != nullptr;*/ }
     std::unique_ptr<sst::clap_juce_shim::ClapJuceShim> clapJuceShim;
     ADD_SHIM_IMPLEMENTATION(clapJuceShim)
     ADD_SHIM_LINUX_TIMER(clapJuceShim)
     std::unique_ptr<juce::Component> createEditor() override
     {
-        pushFullUIRefresh();
-        auto res = std::make_unique<ElastikaEditor>(audioToUi, uiToAudio,
-                                                    [this]() { _host.paramsRequestFlush(); });
+        // pushFullUIRefresh();
+        // auto res = std::make_unique<ElastikaEditor>(audioToUi, uiToAudio,
+        //                                                    [this]() { _host.paramsRequestFlush();
+        //                                                    });
         // res->clapHost = _host.host();
 
-        return res;
+        return nullptr;
     }
 
     bool registerOrUnregisterTimer(clap_id &id, int ms, bool reg) override
@@ -299,4 +304,4 @@ const clap_plugin *makePlugin(const clap_host *h)
     return res->clapPlugin();
 }
 
-} // namespace sapphire_plugins::elastika
+} // namespace sapphire_plugins::tube_unit
