@@ -18,6 +18,7 @@
 #include <string>
 #include <iostream>
 #include <iomanip>
+#include <cstring>
 
 #include "sst/plugininfra/version_information.h"
 

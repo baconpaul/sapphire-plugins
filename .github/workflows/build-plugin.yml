@@ -142,13 +142,13 @@ jobs:
           create_tag: false
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Post to Discord
-        uses: surge-synthesizer/sst-githubactions/discord-release-notify@main
-        with:
-          webhook: ${{ secrets.DISCORD_WEBHOOK }}
-          tag: Nightly
-          title: "A New Sapphire Nightly is Available"
-          subtitle: "Have fun!"
+      #- name: Post to Discord
+      #  uses: surge-synthesizer/sst-githubactions/discord-release-notify@main
+      #  with:
+      #    webhook: ${{ secrets.DISCORD_WEBHOOK }}
+      #    tag: Nightly
+      #    title: "A New Sapphire Nightly is Available"
+      #    subtitle: "Have fun!"
 
   publish-plugin-release:
     name: Publish Release
@@ -164,10 +164,10 @@ jobs:
           create_tag: true
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Post to Discord
-        uses: surge-synthesizer/sst-githubactions/discord-release-notify@main
-        with:
-          webhook: ${{ secrets.DISCORD_WEBHOOK }}
-          tag: ${{ github.ref_name }}
-          title: "A New Sapphire Release is Available"
-          subtitle: "But really, what does stable mean?"
+      #- name: Post to Discord
+      #  uses: surge-synthesizer/sst-githubactions/discord-release-notify@main
+      #  with:
+      #    webhook: ${{ secrets.DISCORD_WEBHOOK }}
+      #    tag: ${{ github.ref_name }}
+      #    title: "A New Sapphire Release is Available"
+      #    subtitle: "But really, what does stable mean?"
