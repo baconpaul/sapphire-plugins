@@ -104,7 +104,7 @@ jobs:
           
           mkdir build/inst
           cd build
-          ../libs/sst/sst-plugininfra/scripts/installer_mac/make_installer.sh "Sapphire" . ../resources/mac_installer inst `date +"%Y-%m-%d"`-`git rev-parse --short HEAD`
+          ../libs/sst/sst-plugininfra/scripts/installer_mac/make_installer.sh "Sapphire" . ../res/mac_installer inst `date +"%Y-%m-%d"`-`git rev-parse --short HEAD`
 
           codesign -d --entitlement - installer-tmp/APP/Six\ Sines.app
 
