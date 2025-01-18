@@ -103,6 +103,8 @@ struct ElastikaClap : public plugHelper_t, sst::clap_juce_shim::EditorProvider
         float **in = process->audio_inputs[0].data32;
         float **out = process->audio_outputs[0].data32;
 
+        processUIQueue(outq);
+
         const clap_event_header_t *nextEvent{nullptr};
         uint32_t nextEventIndex{0};
         if (sz != 0)
@@ -218,7 +220,7 @@ struct ElastikaClap : public plugHelper_t, sst::clap_juce_shim::EditorProvider
             handleEvent(nextEvent);
         }
 
-        // engine->processUIQueue(out);
+        processUIQueue(out);
     }
 
     bool handleEvent(const clap_event_header_t *nextEvent)
@@ -232,11 +234,14 @@ struct ElastikaClap : public plugHelper_t, sst::clap_juce_shim::EditorProvider
                 auto pevt = reinterpret_cast<const clap_event_param_value_t *>(nextEvent);
                 auto par = sst::plugininfra::patch_support::paramFromClapEvent<
                     Param, clap_event_param_value_t>(pevt, patch);
-                par->value = pevt->value;
-                par->lag.setTarget(pevt->value);
+                if (par)
+                {
+                    par->value = pevt->value;
+                    par->lag.setTarget(pevt->value);
 
-                // AudioToUIMsg au = {AudioToUIMsg::UPDATE_PARAM, pid, value};
-                // audioToUi.push(au);
+                    AudioToUIMsg au = {AudioToUIMsg::UPDATE_PARAM, par->meta.id, par->value};
+                    audioToUi.push(au);
+                }
             }
             break;
             default:
@@ -246,6 +251,88 @@ struct ElastikaClap : public plugHelper_t, sst::clap_juce_shim::EditorProvider
         return true;
     }
 
+    void pushFullUIRefresh()
+    {
+        SPLLOG("Full UI Refresh Requested");
+
+        for (const auto *p : patch.params)
+        {
+            AudioToUIMsg au = {AudioToUIMsg::UPDATE_PARAM, p->meta.id, p->value};
+            audioToUi.push(au);
+        }
+    }
+
+    void processUIQueue(const clap_output_events_t *outq)
+    {
+        auto uiM = uiToAudio.pop();
+        while (uiM.has_value())
+        {
+            switch (uiM->action)
+            {
+            case UIToAudioMsg::REQUEST_REFRESH:
+            {
+                // don't do it twice in one process obvs
+                pushFullUIRefresh();
+            }
+            break;
+            case UIToAudioMsg::SET_PARAM:
+            {
+                auto dest = patch.paramMap.at(uiM->paramId);
+
+                dest->value = uiM->value;
+                dest->lag.setTarget(uiM->value);
+
+                clap_event_param_value_t p;
+                p.header.size = sizeof(clap_event_param_value_t);
+                p.header.time = 0;
+                p.header.space_id = CLAP_CORE_EVENT_SPACE_ID;
+                p.header.type = CLAP_EVENT_PARAM_VALUE;
+                p.header.flags = 0;
+                p.param_id = uiM->paramId;
+                p.cookie = dest;
+
+                p.note_id = -1;
+                p.port_index = -1;
+                p.channel = -1;
+                p.key = -1;
+
+                p.value = uiM->value;
+
+                outq->try_push(outq, &p.header);
+            }
+            break;
+            case UIToAudioMsg::BEGIN_EDIT:
+            case UIToAudioMsg::END_EDIT:
+            {
+                clap_event_param_gesture_t p;
+                p.header.size = sizeof(clap_event_param_gesture_t);
+                p.header.time = 0;
+                p.header.space_id = CLAP_CORE_EVENT_SPACE_ID;
+                p.header.type = uiM->action == UIToAudioMsg::BEGIN_EDIT
+                                    ? CLAP_EVENT_PARAM_GESTURE_BEGIN
+                                    : CLAP_EVENT_PARAM_GESTURE_END;
+                p.header.flags = 0;
+                p.param_id = uiM->paramId;
+
+                outq->try_push(outq, &p.header);
+            }
+            break;
+            case UIToAudioMsg::EDITOR_ATTACH_DETATCH:
+            {
+                auto was = isEditorAttached;
+                ;
+                isEditorAttached = uiM->paramId;
+                if (!was && isEditorAttached)
+                {
+                    pushFullUIRefresh();
+                }
+            }
+            break;
+            }
+            uiM = uiToAudio.pop();
+        }
+    }
+
   public:
     bool implementsGui() const noexcept override { return clapJuceShim != nullptr; }
     std::unique_ptr<sst::clap_juce_shim::ClapJuceShim> clapJuceShim;
@@ -253,9 +340,11 @@ struct ElastikaClap : public plugHelper_t, sst::clap_juce_shim::EditorProvider
     ADD_SHIM_LINUX_TIMER(clapJuceShim)
     std::unique_ptr<juce::Component> createEditor() override
     {
+        pushFullUIRefresh();
         auto res = std::make_unique<ElastikaEditor>(audioToUi, uiToAudio,
                                                     [this]() { _host.paramsRequestFlush(); });
         // res->clapHost = _host.host();
+
         return res;
     }
 

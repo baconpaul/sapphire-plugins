@@ -12,6 +12,9 @@
  * The source code and license are at https://github.com/baconpaul/sapphire-plugins
  */
 
+#ifndef SAPPHIRE_PLUGINS_ELASTIKA_PATCH_H
+#define SAPPHIRE_PLUGINS_ELASTIKA_PATCH_H
+
 #include <vector>
 #include <array>
 #include <unordered_map>
@@ -90,3 +93,5 @@ struct Patch : pats::PatchBase<Patch, Param>
     float migrateParamValueFromVersion(Param *, float v, uint32_t) { return v; }
 };
 } // namespace sapphire_plugins::elastika
+
+#endif

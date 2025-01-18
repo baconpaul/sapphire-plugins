@@ -157,4 +157,4 @@ Slider::SliderLayout LookAndFeel::getSliderLayout(Slider &slider)
     return layout;
 }
 
-} // namespace sapphire_plugin::shared
+} // namespace sapphire_plugins::shared

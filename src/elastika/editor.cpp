@@ -22,7 +22,6 @@
 namespace sapphire_plugins::elastika
 {
 
-
 // Helper function for placing a control exactly. Juce positioning doesn't take subpixel locations,
 // unlike the rest of Juce. So apply a rounded version of that and add a transform that shunts it to
 // the exact right location.
@@ -39,24 +38,25 @@ void set_control_position(juce::Component &control, float cx, float cy, float dx
                                                             real.getY() - rounded.getY()));
 }
 
-struct JNK : public juce::Component
+struct IdleTimer : juce::Timer
 {
-    void paint(juce::Graphics &g) override
-    {
-        SPLLOG("paint " << getLocalBounds().toString());
-        g.fillAll(juce::Colours::red);
-    }
+    ElastikaEditor &editor;
+    IdleTimer(ElastikaEditor &e) : editor(e) {}
+    void timerCallback() override { editor.idle(); }
 };
 
 ElastikaEditor::ElastikaEditor(audioToUIQueue_t &atou, uiToAudioQueue_T &utoa,
                                std::function<void()> flushOperator)
+    : audioToUI(atou), uiToAudio(utoa), flushOperator(flushOperator)
 {
+    // Process any events we have
+    idle();
 
     auto knob_xml = juce::XmlDocument::parse(*shared::getSvgForPath("res/knob_graphics/knob.svg"));
-    auto marker_xml = juce::XmlDocument::parse(*shared::getSvgForPath("res/knob_graphics/knob-marker.svg"));
+    auto marker_xml =
+        juce::XmlDocument::parse(*shared::getSvgForPath("res/knob_graphics/knob-marker.svg"));
     lnf = std::make_unique<shared::LookAndFeel>(juce::Drawable::createFromSVG(*knob_xml),
-                                                  juce::Drawable::createFromSVG(*marker_xml));
-    setLookAndFeel(lnf.get());
+                                                juce::Drawable::createFromSVG(*marker_xml));
 
     auto bg = shared::getSvgForPath("libs/sapphire/res/elastika.svg");
     if (bg.has_value())
@@ -72,19 +72,45 @@ ElastikaEditor::ElastikaEditor(audioToUIQueue_t &atou, uiToAudioQueue_T &utoa,
     }
 
     input_tilt_knob = make_large_knob("input_tilt_knob");
+    bindSlider(input_tilt_knob, patchCopy.inputTilt);
 
-    auto r = Sapphire::FindComponent("elastika", "output_tilt_knob");
-    auto cx = r.cx;
-    auto cy = r.cy;
+    output_tilt_knob = make_large_knob("output_tilt_knob");
+    bindSlider(output_tilt_knob, patchCopy.outputTilt);
 
-    junk = std::make_unique<JNK>();
-    junk->setSize(11,11);
-    background->addAndMakeVisible(*junk);
-    set_control_position(*junk, cx, cy, 0.5, 0.5);
+    drive_knob = make_large_knob("drive_knob");
+    bindSlider(drive_knob, patchCopy.drive);
 
+    level_knob = make_large_knob("level_knob");
+    bindSlider(level_knob, patchCopy.level);
+
+    fric_slider = make_slider("fric_slider");
+    bindSlider(fric_slider, patchCopy.friction);
+
+    curl_slider = make_slider("curl_slider");
+    bindSlider(curl_slider, patchCopy.curl);
+
+    span_slider = make_slider("span_slider");
+    bindSlider(span_slider, patchCopy.span);
+
+    mass_slider = make_slider("mass_slider");
+    bindSlider(mass_slider, patchCopy.mass);
+
+    stif_slider = make_slider("stif_slider");
+    bindSlider(stif_slider, patchCopy.stiffness);
 
     setSize(300, 600);
     resized();
+
+    idleTimer = std::make_unique<IdleTimer>(*this);
+    idleTimer->startTimer(1000. / 60.);
+
+    uiToAudio.push({UIToAudioMsg::EDITOR_ATTACH_DETATCH, true});
+}
+
+ElastikaEditor::~ElastikaEditor()
+{
+    uiToAudio.push({UIToAudioMsg::EDITOR_ATTACH_DETATCH, false});
+    idleTimer->stopTimer();
 }
 
 void ElastikaEditor::resized()
@@ -95,6 +121,36 @@ void ElastikaEditor::resized()
     }
 }
 
+void ElastikaEditor::idle()
+{
+    auto aum = audioToUI.pop();
+    while (aum.has_value())
+    {
+        switch (aum->action)
+        {
+        case AudioToUIMsg::UPDATE_PARAM:
+        {
+            auto pid = aum->paramId;
+            auto val = aum->value;
+            auto p = patchCopy.paramMap.at(pid);
+            if (p)
+            {
+                p->value = val;
+                auto val01 = (val - p->meta.minVal) / (p->meta.maxVal - p->meta.minVal);
+                auto sbi = sliderByID.find(pid);
+                if (sbi != sliderByID.end() && sbi->second)
+                {
+                    sbi->second->setValue(val01, juce::dontSendNotification);
+                }
+            }
+        }
+        break;
+        case AudioToUIMsg::UPDATE_VU:
+            break;
+        }
+        aum = audioToUI.pop();
+    }
+}
 
 std::unique_ptr<juce::Slider> ElastikaEditor::make_large_knob(const std::string &pos)
 {
@@ -113,6 +169,7 @@ std::unique_ptr<juce::Slider> ElastikaEditor::make_large_knob(const std::string 
     kn->setValue(0.5);
     kn->setMouseDragSensitivity(100);
     kn->setDoubleClickReturnValue(true, 0.5);
+    kn->setLookAndFeel(lnf.get());
 
     background->addAndMakeVisible(*kn);
     set_control_position(*kn, cx, cy, dx, dy);
@@ -120,5 +177,58 @@ std::unique_ptr<juce::Slider> ElastikaEditor::make_large_knob(const std::string 
     return kn;
 }
 
+std::unique_ptr<juce::Slider> ElastikaEditor::make_slider(const std::string &pos)
+{
+    auto r = Sapphire::FindComponent("elastika", pos);
+    auto cx = r.cx;
+    auto cy = r.cy;
+
+    static constexpr float dx = 0.6875f;
+    static constexpr float dy = 0.6875f;
+    auto sl = std::make_unique<juce::Slider>();
+    sl->setSliderStyle(juce::Slider::LinearVertical);
+    sl->setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
+    sl->setSize(8, 28);
+    sl->setMouseDragSensitivity(28);
+    sl->setRange(0, 1);
+    sl->setValue(0.5);
+    sl->setDoubleClickReturnValue(true, 0.5);
+    sl->setLookAndFeel(lnf.get());
+    // TODO: Get the "snap to mouse position" to work with the scaling we have where we only use 90%
+    // of the track (the remaining 10% is for the bottom part of the thumb; the thumb's "position"
+    // is the very top pixel of the thumb). Until then, it doesn't work right throughout the whole
+    // track, so we set this to false.
+    sl->setSliderSnapsToMousePosition(false);
+
+    background->addAndMakeVisible(*sl);
+    set_control_position(*sl, cx, cy, dx, dy);
+    return sl;
+}
+
+void ElastikaEditor::bindSlider(const std::unique_ptr<juce::Slider> &slider, Param &p)
+{
+    slider->setTitle(p.meta.name);
+    auto val01 = (p.value - p.meta.minVal) / (p.meta.maxVal - p.meta.minVal);
+    slider->setValue(val01, juce::dontSendNotification);
+
+    slider->onDragStart = [this, id = p.meta.id]() {
+        uiToAudio.push({UIToAudioMsg::BEGIN_EDIT, id});
+    };
+
+    slider->onDragEnd = [this, id = p.meta.id]() { uiToAudio.push({UIToAudioMsg::END_EDIT, id}); };
+
+    slider->onValueChange = [this, sl = slider.get(), par = p]()
+    {
+        float val = sl->getValue();
+        // val is 0..1 so
+        val = val * (par.meta.maxVal - par.meta.minVal) + par.meta.minVal;
+
+        uiToAudio.push({UIToAudioMsg::SET_PARAM, par.meta.id, val});
+        if (flushOperator)
+            flushOperator();
+    };
+
+    sliderByID[p.meta.id] = juce::Component::SafePointer<juce::Slider>(slider.get());
+}
 
 } // namespace sapphire_plugins::elastika

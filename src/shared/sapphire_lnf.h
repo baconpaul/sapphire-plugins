@@ -41,6 +41,6 @@ class LookAndFeel : public juce::LookAndFeel_V4
 
     int rotary_scale_factor_;
 };
-} // namespace sapphire_plugin::shared
+} // namespace sapphire_plugins::shared
 
 #endif // SAPPHIRE_PLUGINS_SHARED_SAPPHIRE_LNF_H
