@@ -130,12 +130,12 @@ struct TubeUnitClap : public plugHelper_t, sst::clap_juce_shim::EditorProvider
                     p->lag.process();
                 engine->setAirflow(patch.airflow.lag.v);
                 engine->setVortex(patch.vortex.lag.v);
-                engine->setBypassWidth(patch.bypassWidth.lag.v);
-                engine->setBypassCenter(patch.bypassCenter.lag.v);
-                engine->setReflectionAngle(M_PI * patch.reflectionAngle.lag.v);
-                engine->setReflectionDecay(patch.reflectionDecay.lag.v);
-                engine->setRootFrequency(4 * std::pow(2.f, patch.rootFrequency.lag.v));
-                engine->setSpringConstant(0.005f * std::pow(10.0f, 4.0f * patch.stiffness.lag.v));
+                engine->setBypassWidth(patch.width.lag.v);
+                engine->setBypassCenter(patch.center.lag.v);
+                engine->setReflectionAngle(M_PI * patch.angle.lag.v);
+                engine->setReflectionDecay(patch.decay.lag.v);
+                engine->setRootFrequency(4 * std::pow(2.f, patch.root.lag.v));
+                engine->setSpringConstant(0.005f * std::pow(10.0f, 4.0f * patch.spring.lag.v));
             }
             engine->process(out[0][s], out[1][s], in[0][s], in[1][s]);
             blockPos = (blockPos + 1) & (smoothingBlock - 1);
