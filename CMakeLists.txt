@@ -30,7 +30,7 @@ add_subdirectory(libs)
 
 include(cmake/CmakeRC.cmake)
 
-file(GLOB_RECURSE GRAPHICS  "res/knob_graphics/*" "libs/sapphire/res/*.svg")
+file(GLOB_RECURSE GRAPHICS  "res/knob_graphics/*" "libs/sapphire/res/*.svg" "libs/sapphire/export/*.svg")
 list(LENGTH GRAPHICS glen)
 message(STATUS "Adding ${glen} graphics files to the binary image")
 cmrc_add_resource_library(${PROJECT_NAME}-graphics NAMESPACE sapphire_graphics ${GRAPHICS})

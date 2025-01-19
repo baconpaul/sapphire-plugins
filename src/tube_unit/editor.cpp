@@ -58,7 +58,7 @@ TubeUnitEditor::TubeUnitEditor(shared::audioToUIQueue_t &atou, shared::uiToAudio
     lnf = std::make_unique<shared::LookAndFeel>(juce::Drawable::createFromSVG(*knob_xml),
                                                 juce::Drawable::createFromSVG(*marker_xml));
 
-    auto bg = shared::getSvgForPath("libs/sapphire/res/tubeunit.svg");
+    auto bg = shared::getSvgForPath("libs/sapphire/export/tubeunit.svg");
     if (bg.has_value())
     {
         auto bgx = juce::XmlDocument::parse(*bg);
