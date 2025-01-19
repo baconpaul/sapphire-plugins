@@ -48,6 +48,7 @@ struct TubeUnitEditor : public juce::Component
     std::unique_ptr<juce::Slider> angle;
     std::unique_ptr<juce::Slider> root;
     std::unique_ptr<juce::Slider> spring;
+    std::unique_ptr<juce::Slider> outputLevel;
 
     std::unique_ptr<shared::LookAndFeel> lnf;
 

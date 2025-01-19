@@ -71,6 +71,10 @@ TubeUnitEditor::TubeUnitEditor(shared::audioToUIQueue_t &atou, shared::uiToAudio
         }
     }
 
+    // FIXFIXFIX: text labels live inside tubeunit_labels.svg.
+    // FIXFIXFIX: "vent" lives inside tubeunit_vent.svg.
+    // FIXFIXFIX: "seal" lives inside tubeunit_seal.svg.
+
     airflow = shared::makeLargeKnob(this, "tubeunit", "airflow_knob");
     shared::bindSlider(this, airflow, patchCopy.airflow);
 
@@ -94,6 +98,9 @@ TubeUnitEditor::TubeUnitEditor(shared::audioToUIQueue_t &atou, shared::uiToAudio
 
     spring = shared::makeLargeKnob(this, "tubeunit", "spring_knob");
     shared::bindSlider(this, spring, patchCopy.spring);
+
+    outputLevel = shared::makeLargeKnob(this, "tubeunit", "level_knob");
+    shared::bindSlider(this, outputLevel, patchCopy.outputLevel);
 
     setSize(300, 600);
     resized();

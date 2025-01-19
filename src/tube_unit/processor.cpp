@@ -128,6 +128,7 @@ struct TubeUnitClap : public plugHelper_t, sst::clap_juce_shim::EditorProvider
             {
                 for (auto &[i, p] : patch.paramMap)
                     p->lag.process();
+                engine->setGain(patch.outputLevel.lag.v);
                 engine->setAirflow(patch.airflow.lag.v);
                 engine->setVortex(patch.vortex.lag.v);
                 engine->setBypassWidth(patch.width.lag.v);

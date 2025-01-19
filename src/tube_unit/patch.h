@@ -51,6 +51,7 @@ struct Patch : pats::PatchBase<Patch, Param>
     Param angle;
     Param root;
     Param spring;
+    Param outputLevel;
 
     Patch()
         : pats::PatchBase<Patch, Param>(), airflow(floatMd()
@@ -85,7 +86,13 @@ struct Patch : pats::PatchBase<Patch, Param>
                             .withRange(0., 8.)
                             .withLinearScaleFormatting("")
                             .withDefault(2.7279248)),
-          spring(floatMd().withName("Spring Stiffness").withID(170).asPercent().withDefault(0.5))
+          spring(floatMd().withName("Spring Stiffness").withID(170).asPercent().withDefault(0.5)),
+          outputLevel(floatMd()
+            .withName("Output Level")
+            .withID(180)
+            .withRange(0.0, 2.0)
+            .withLinearScaleFormatting("")
+            .withDefault(1.0))
 
     {
         this->pushSingleParam(&airflow);
@@ -96,6 +103,7 @@ struct Patch : pats::PatchBase<Patch, Param>
         this->pushSingleParam(&angle);
         this->pushSingleParam(&root);
         this->pushSingleParam(&spring);
+        this->pushSingleParam(&outputLevel);
 
         onResetToInit = [](auto &patch)
         {
