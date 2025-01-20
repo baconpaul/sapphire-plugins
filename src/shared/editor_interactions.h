@@ -193,8 +193,8 @@ std::unique_ptr<juce::Slider> makeLargeKnob(Editor *editor, const std::string &p
     auto cx = r.cx;
     auto cy = r.cy;
 
-    static constexpr float dx = 0.5f;
-    static constexpr float dy = 0.5f;
+    static constexpr float dx = 1.5;
+    static constexpr float dy = 0.0;
     auto kn = std::make_unique<juce::Slider>();
     kn->setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
     kn->setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
@@ -220,12 +220,12 @@ std::unique_ptr<juce::Slider> makeSlider(Editor *editor, const std::string &pref
     auto cx = r.cx;
     auto cy = r.cy;
 
-    static constexpr float dx = 0.6875f;
-    static constexpr float dy = 0.6875f;
+    static constexpr float dx = 2;
+    static constexpr float dy = 1;
     auto sl = std::make_unique<juce::Slider>();
     sl->setSliderStyle(juce::Slider::LinearVertical);
     sl->setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
-    sl->setSize(8, 28);
+    sl->setSize(10, 28);
     sl->setMouseDragSensitivity(28);
     sl->setRange(0, 1);
     sl->setValue(0.5);
