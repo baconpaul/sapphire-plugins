@@ -23,5 +23,5 @@ and then install the resulting artifact by hand.
 
 Right now has
 
-- elastika with a panel
-- tube unit with params but no knobs on panel
+- Elastika
+- Tube Unit
