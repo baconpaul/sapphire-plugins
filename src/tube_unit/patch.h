@@ -62,37 +62,37 @@ struct Patch : pats::PatchBase<Patch, Param>
                                                        .withLinearScaleFormatting("")),
           vortex(floatMd().withName("Vortex").withID(110).asPercent().withDefault(0.5)),
           width(floatMd()
-                          .withName("Bypass Width")
-                          .withID(120)
-                          .withRange(0.5, 20)
-                          .withDefault(6)
-                          .withLinearScaleFormatting("")),
+                    .withName("Bypass Width")
+                    .withID(120)
+                    .withRange(0.5, 20)
+                    .withDefault(6)
+                    .withLinearScaleFormatting("")),
           center(floatMd()
-                           .withName("Bypass Center")
-                           .withID(130)
-                           .withRange(-10, 10)
-                           .withDefault(0.f)
-                           .withLinearScaleFormatting("")),
+                     .withName("Bypass Center")
+                     .withID(130)
+                     .withRange(-10, 10)
+                     .withDefault(0.f)
+                     .withLinearScaleFormatting("")),
           decay(floatMd().withName("Reflection Decay").withID(140).asPercent().withDefault(0.5f)),
           angle(floatMd()
-                              .withName("Reflection Angle")
-                              .withID(150)
-                              .withRange(0., 1.)
-                              .withLinearScaleFormatting("")
-                              .withDefault(0.1f)),
+                    .withName("Reflection Angle")
+                    .withID(150)
+                    .withRange(0., 1.)
+                    .withLinearScaleFormatting("")
+                    .withDefault(0.1f)),
           root(floatMd()
-                            .withName("Root Frequency")
-                            .withID(160)
-                            .withRange(0., 8.)
-                            .withLinearScaleFormatting("")
-                            .withDefault(2.7279248)),
+                   .withName("Root Frequency")
+                   .withID(160)
+                   .withRange(0., 8.)
+                   .withDefault(2.7279248)
+                   .withATwoToTheBFormatting(4, 1, "hz")),
           spring(floatMd().withName("Spring Stiffness").withID(170).asPercent().withDefault(0.5)),
           outputLevel(floatMd()
-            .withName("Output Level")
-            .withID(180)
-            .withRange(0.0, 2.0)
-            .withLinearScaleFormatting("")
-            .withDefault(1.0))
+                          .withName("Output Level")
+                          .withID(180)
+                          .withRange(0.0, 2.0)
+                          .withLinearScaleFormatting("")
+                          .withDefault(1.0))
 
     {
         this->pushSingleParam(&airflow);

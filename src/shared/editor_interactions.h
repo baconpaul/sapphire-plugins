@@ -16,6 +16,7 @@
 #define SAPPHIRE_PLUGINS_SHARED_EDITOR_INTERACTIONS_H
 
 #include "sapphire_panel.hpp"
+#include "tooltip.h"
 
 namespace sapphire_plugins::shared
 {
@@ -148,28 +149,101 @@ void processUIQueueFromAudio(Processor *proc, const clap_output_events_t *outq)
     }
 }
 
+template <typename Editor> inline void setTooltipValues(Editor *e, uint32_t id)
+{
+    auto &par = e->patchCopy.paramMap.at(id);
+    e->tooltip->title = par->meta.name;
+    auto oval = par->meta.valueToString(par->value);
+    if (oval.has_value())
+        e->tooltip->value = oval.value();
+    else
+        e->tooltip->value = "err";
+
+    e->repaint();
+}
+template <typename Editor> inline void showTooltip(Editor *e, const juce::Slider &s, uint32_t id)
+{
+    if (!e->tooltip)
+    {
+        e->tooltip = std::make_unique<shared::Tooltip>();
+        e->background->addChildComponent(*e->tooltip);
+    }
+
+    if (!s.getParentComponent())
+        return;
+
+    auto b = s.getBoundsInParent();
+    auto pb = s.getParentComponent()->getLocalBounds();
+    ;
+
+    auto topHalf = true;
+    if (b.getY() > pb.getHeight() / 2)
+        topHalf = false;
+    auto leftSide = true;
+    if (b.getX() > pb.getWidth() / 2)
+        leftSide = false;
+
+    auto r = juce::Rectangle<int>(0, 0, 25, 11);
+    if (topHalf)
+        r = r.translated(0, b.getBottom());
+    else
+        r = r.translated(0, b.getY() - r.getHeight());
+
+    if (leftSide)
+        r = r.translated(b.getX(), 0);
+    else
+        r = r.translated(b.getRight() - r.getWidth(), 0);
+    e->tooltip->setBounds(r);
+    e->tooltip->setVisible(true);
+    e->tooltip->toFront(true);
+    setTooltipValues(e, id);
+}
+
+template <typename Editor> inline void updateTooltip(Editor *e, const juce::Slider &s, uint32_t id)
+{
+    if (e->tooltip)
+        setTooltipValues(e, id);
+}
+
+template <typename Editor> inline void hideTooltip(Editor *e)
+{
+    if (e->tooltip)
+        e->tooltip->setVisible(false);
+}
+
 template <typename Editor, typename Param>
-void bindSlider(Editor *editor, const std::unique_ptr<juce::Slider> &slider, Param &p)
+inline void bindSlider(Editor *editor, const std::unique_ptr<juce::Slider> &slider, Param &p)
 {
     slider->setTitle(p.meta.name);
     auto val01 = (p.value - p.meta.minVal) / (p.meta.maxVal - p.meta.minVal);
     slider->setValue(val01, juce::dontSendNotification);
 
-    slider->onDragStart = [editor, id = p.meta.id]() {
-        editor->uiToAudio.push({UIToAudioMsg::BEGIN_EDIT, id});
-    };
-
-    slider->onDragEnd = [editor, id = p.meta.id]() {
-        editor->uiToAudio.push({UIToAudioMsg::END_EDIT, id});
-    };
-
-    slider->onValueChange = [editor, sl = slider.get(), par = p]()
+    slider->onDragStart =
+        [editor, sl = juce::Component::SafePointer(slider.get()), id = p.meta.id]()
     {
+        editor->uiToAudio.push({UIToAudioMsg::BEGIN_EDIT, id});
+        if (sl)
+            showTooltip(editor, *sl, id);
+    };
+
+    slider->onDragEnd = [editor, sl = juce::Component::SafePointer(slider.get()), id = p.meta.id]()
+    {
+        editor->uiToAudio.push({UIToAudioMsg::END_EDIT, id});
+        if (sl)
+            hideTooltip(editor);
+    };
+
+    slider->onValueChange = [editor, sl = juce::Component::SafePointer(slider.get()), par = p]()
+    {
+        if (!sl)
+            return;
         float val = sl->getValue();
         // val is 0..1 so
         val = val * (par.meta.maxVal - par.meta.minVal) + par.meta.minVal;
-
         editor->uiToAudio.push({UIToAudioMsg::SET_PARAM, par.meta.id, val});
+        editor->patchCopy.paramMap.at(par.meta.id)->value = val;
+
+        updateTooltip(editor, *sl, par.meta.id);
         if (editor->flushOperator)
             editor->flushOperator();
     };
