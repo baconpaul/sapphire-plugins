@@ -102,7 +102,7 @@ TubeUnitEditor::TubeUnitEditor(shared::audioToUIQueue_t &atou, shared::uiToAudio
     outputLevel = shared::makeLargeKnob(this, "tubeunit", "level_knob");
     shared::bindSlider(this, outputLevel, patchCopy.outputLevel);
 
-    setSize(300, 600);
+    setSize(286, 600);
     resized();
 
     idleTimer = std::make_unique<IdleTimer>(*this);
