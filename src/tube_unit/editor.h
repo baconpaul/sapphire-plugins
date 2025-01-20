@@ -21,6 +21,7 @@
 
 #include "patch.h"
 #include "shared/editor_interactions.h"
+#include "shared/tooltip.h"
 
 namespace sapphire_plugins::tube_unit
 {
@@ -55,6 +56,8 @@ struct TubeUnitEditor : public juce::Component
     shared::audioToUIQueue_t &audioToUI;
     shared::uiToAudioQueue_T &uiToAudio;
     std::function<void()> flushOperator;
+
+    std::unique_ptr<shared::Tooltip> tooltip;
 };
 } // namespace sapphire_plugins::tube_unit
 #endif

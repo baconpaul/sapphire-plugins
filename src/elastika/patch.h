@@ -52,7 +52,12 @@ struct Patch : pats::PatchBase<Patch, Param>
           span(floatMd().withName("Span").withID(110).asPercent().withDefault(0.5)),
           stiffness(floatMd().withName("Stiffness").withID(120).asPercent().withDefault(0.5)),
           curl(floatMd().withName("Curl").withID(130).asPercentBipolar().withDefault(0.f)),
-          mass(floatMd().withName("Mass").withID(140).asPercentBipolar().withDefault(0.f)),
+          mass(floatMd()
+                   .withName("Mass")
+                   .withID(140)
+                   .withRange(-1, 1)
+                   .withDefault(0.f)
+                   .withATwoToTheBFormatting(1.0, std::log2(10), "")),
           drive(floatMd()
                     .withName("Drive")
                     .withID(150)
@@ -65,8 +70,19 @@ struct Patch : pats::PatchBase<Patch, Param>
                     .withRange(0., 2.)
                     .withLinearScaleFormatting("")
                     .withDefault(1.f)),
-          inputTilt(floatMd().withName("Input Tilt").withID(170).asPercent().withDefault(0.5)),
-          outputTilt(floatMd().withName("Output Tilt").withID(180).asPercent().withDefault(0.5))
+          inputTilt(floatMd()
+                        .withName("Input Tilt")
+                        .withID(170)
+                        .withRange(0., 1.)
+                        .withDefault(0.5)
+                        .withLinearScaleFormatting(u8"\u00B0", 90)),
+          outputTilt(floatMd()
+                         .withName("Output Tilt")
+                         .withID(180)
+                         .withRange(0, 1)
+                         .withDefault(0.5)
+                         .withDecimalPlaces(3)
+                         .withLinearScaleFormatting(u8"\u00B0", 90))
     {
         this->pushSingleParam(&friction);
         this->pushSingleParam(&stiffness);

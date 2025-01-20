@@ -18,6 +18,7 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include "sst/cpputils/ring_buffer.h"
 #include "shared/sapphire_lnf.h"
+#include "shared/tooltip.h"
 
 #include "patch.h"
 #include "shared/editor_interactions.h"
@@ -57,6 +58,8 @@ struct ElastikaEditor : public juce::Component
     shared::audioToUIQueue_t &audioToUI;
     shared::uiToAudioQueue_T &uiToAudio;
     std::function<void()> flushOperator;
+
+    std::unique_ptr<shared::Tooltip> tooltip;
 };
 } // namespace sapphire_plugins::elastika
 #endif
