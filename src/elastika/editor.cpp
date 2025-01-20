@@ -84,7 +84,7 @@ ElastikaEditor::ElastikaEditor(shared::audioToUIQueue_t &atou, shared::uiToAudio
     stif_slider = shared::makeSlider(this, modcode, "stif_slider");
     shared::bindSlider(this, stif_slider, patchCopy.stiffness);
 
-    setSize(368, 600);
+    setSize(286, 466);
     resized();
 
     idleTimer = std::make_unique<IdleTimer>(*this);
