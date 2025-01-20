@@ -42,7 +42,7 @@ ElastikaEditor::ElastikaEditor(shared::audioToUIQueue_t &atou, shared::uiToAudio
     lnf = std::make_unique<shared::LookAndFeel>(juce::Drawable::createFromSVG(*knob_xml),
                                                 juce::Drawable::createFromSVG(*marker_xml));
 
-    auto bg = shared::getSvgForPath("libs/sapphire/res/elastika.svg");
+    auto bg = shared::getSvgForPath("libs/sapphire/export/elastika.svg");
     if (bg.has_value())
     {
         auto bgx = juce::XmlDocument::parse(*bg);
@@ -55,34 +55,36 @@ ElastikaEditor::ElastikaEditor(shared::audioToUIQueue_t &atou, shared::uiToAudio
         }
     }
 
-    input_tilt_knob = shared::makeLargeKnob(this, "elastika", "input_tilt_knob");
+    const std::string modcode("elastika_export");
+
+    input_tilt_knob = shared::makeLargeKnob(this, modcode, "input_tilt_knob");
     shared::bindSlider(this, input_tilt_knob, patchCopy.inputTilt);
 
-    output_tilt_knob = shared::makeLargeKnob(this, "elastika", "output_tilt_knob");
+    output_tilt_knob = shared::makeLargeKnob(this, modcode, "output_tilt_knob");
     shared::bindSlider(this, output_tilt_knob, patchCopy.outputTilt);
 
-    drive_knob = shared::makeLargeKnob(this, "elastika", "drive_knob");
+    drive_knob = shared::makeLargeKnob(this, modcode, "drive_knob");
     shared::bindSlider(this, drive_knob, patchCopy.drive);
 
-    level_knob = shared::makeLargeKnob(this, "elastika", "level_knob");
+    level_knob = shared::makeLargeKnob(this, modcode, "level_knob");
     shared::bindSlider(this, level_knob, patchCopy.level);
 
-    fric_slider = shared::makeSlider(this, "elastika", "fric_slider");
+    fric_slider = shared::makeSlider(this, modcode, "fric_slider");
     shared::bindSlider(this, fric_slider, patchCopy.friction);
 
-    curl_slider = shared::makeSlider(this, "elastika", "curl_slider");
+    curl_slider = shared::makeSlider(this, modcode, "curl_slider");
     shared::bindSlider(this, curl_slider, patchCopy.curl);
 
-    span_slider = shared::makeSlider(this, "elastika", "span_slider");
+    span_slider = shared::makeSlider(this, modcode, "span_slider");
     shared::bindSlider(this, span_slider, patchCopy.span);
 
-    mass_slider = shared::makeSlider(this, "elastika", "mass_slider");
+    mass_slider = shared::makeSlider(this, modcode, "mass_slider");
     shared::bindSlider(this, mass_slider, patchCopy.mass);
 
-    stif_slider = shared::makeSlider(this, "elastika", "stif_slider");
+    stif_slider = shared::makeSlider(this, modcode, "stif_slider");
     shared::bindSlider(this, stif_slider, patchCopy.stiffness);
 
-    setSize(300, 600);
+    setSize(368, 600);
     resized();
 
     idleTimer = std::make_unique<IdleTimer>(*this);

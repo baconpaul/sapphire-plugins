@@ -43,8 +43,15 @@ struct Patch : pats::PatchBase<Patch, Param>
 
     static md_t floatMd() { return md_t().asFloat().withFlags(floatFlags); }
 
-    Param airflow, reflectionDecay, reflectionAngle, stiffness, bypassWidth, bypassCenter,
-        rootFrequency, vortex;
+    Param airflow;
+    Param vortex;
+    Param width;
+    Param center;
+    Param decay;
+    Param angle;
+    Param root;
+    Param spring;
+    Param outputLevel;
 
     Patch()
         : pats::PatchBase<Patch, Param>(), airflow(floatMd()
@@ -54,43 +61,49 @@ struct Patch : pats::PatchBase<Patch, Param>
                                                        .withDefault(1)
                                                        .withLinearScaleFormatting("")),
           vortex(floatMd().withName("Vortex").withID(110).asPercent().withDefault(0.5)),
-          bypassWidth(floatMd()
+          width(floatMd()
                           .withName("Bypass Width")
                           .withID(120)
                           .withRange(0.5, 20)
                           .withDefault(6)
                           .withLinearScaleFormatting("")),
-          bypassCenter(floatMd()
+          center(floatMd()
                            .withName("Bypass Center")
                            .withID(130)
                            .withRange(-10, 10)
                            .withDefault(0.f)
                            .withLinearScaleFormatting("")),
-          reflectionDecay(
-              floatMd().withName("Reflection Decay").withID(140).asPercent().withDefault(0.5f)),
-          reflectionAngle(floatMd()
+          decay(floatMd().withName("Reflection Decay").withID(140).asPercent().withDefault(0.5f)),
+          angle(floatMd()
                               .withName("Reflection Angle")
                               .withID(150)
                               .withRange(0., 1.)
                               .withLinearScaleFormatting("")
                               .withDefault(0.1f)),
-          rootFrequency(floatMd()
-                            .withName("RootFrequency")
+          root(floatMd()
+                            .withName("Root Frequency")
                             .withID(160)
                             .withRange(0., 8.)
                             .withLinearScaleFormatting("")
                             .withDefault(2.7279248)),
-          stiffness(floatMd().withName("Stiffness").withID(170).asPercent().withDefault(0.5))
+          spring(floatMd().withName("Spring Stiffness").withID(170).asPercent().withDefault(0.5)),
+          outputLevel(floatMd()
+            .withName("Output Level")
+            .withID(180)
+            .withRange(0.0, 2.0)
+            .withLinearScaleFormatting("")
+            .withDefault(1.0))
 
     {
         this->pushSingleParam(&airflow);
         this->pushSingleParam(&vortex);
-        this->pushSingleParam(&bypassWidth);
-        this->pushSingleParam(&bypassCenter);
-        this->pushSingleParam(&reflectionDecay);
-        this->pushSingleParam(&reflectionAngle);
-        this->pushSingleParam(&rootFrequency);
-        this->pushSingleParam(&stiffness);
+        this->pushSingleParam(&width);
+        this->pushSingleParam(&center);
+        this->pushSingleParam(&decay);
+        this->pushSingleParam(&angle);
+        this->pushSingleParam(&root);
+        this->pushSingleParam(&spring);
+        this->pushSingleParam(&outputLevel);
 
         onResetToInit = [](auto &patch)
         {

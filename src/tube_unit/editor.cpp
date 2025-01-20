@@ -58,7 +58,7 @@ TubeUnitEditor::TubeUnitEditor(shared::audioToUIQueue_t &atou, shared::uiToAudio
     lnf = std::make_unique<shared::LookAndFeel>(juce::Drawable::createFromSVG(*knob_xml),
                                                 juce::Drawable::createFromSVG(*marker_xml));
 
-    auto bg = shared::getSvgForPath("libs/sapphire/res/tubeunit.svg");
+    auto bg = shared::getSvgForPath("libs/sapphire/export/tubeunit.svg");
     if (bg.has_value())
     {
         auto bgx = juce::XmlDocument::parse(*bg);
@@ -71,39 +71,38 @@ TubeUnitEditor::TubeUnitEditor(shared::audioToUIQueue_t &atou, shared::uiToAudio
         }
     }
 
-    airflow = shared::makeLargeKnob(this, "tube_unit", "airflow_knob");
-    shared::set_control_position(*airflow, 15, 15, 0.5, 0.5);
+    // FIXFIXFIX: text labels live inside tubeunit_labels.svg.
+    // FIXFIXFIX: "vent" lives inside tubeunit_vent.svg.
+    // FIXFIXFIX: "seal" lives inside tubeunit_seal.svg.
+
+    airflow = shared::makeLargeKnob(this, "tubeunit", "airflow_knob");
     shared::bindSlider(this, airflow, patchCopy.airflow);
-#if 0
-    input_tilt_knob = make_large_knob("input_tilt_knob");
-    shared::bindSlider(this, input_tilt_knob, patchCopy.inputTilt);
 
-    output_tilt_knob = make_large_knob("output_tilt_knob");
-    shared::bindSlider(this, output_tilt_knob, patchCopy.outputTilt);
+    vortex = shared::makeLargeKnob(this, "tubeunit", "vortex_knob");
+    shared::bindSlider(this, vortex, patchCopy.vortex);
 
-    drive_knob = make_large_knob("drive_knob");
-    shared::bindSlider(this, drive_knob, patchCopy.drive);
+    width = shared::makeLargeKnob(this, "tubeunit", "width_knob");
+    shared::bindSlider(this, width, patchCopy.width);
 
-    level_knob = make_large_knob("level_knob");
-    shared::bindSlider(this, level_knob, patchCopy.level);
+    center = shared::makeLargeKnob(this, "tubeunit", "center_knob");
+    shared::bindSlider(this, center, patchCopy.center);
 
-    fric_slider = make_slider("fric_slider");
-    shared::bindSlider(this, fric_slider, patchCopy.friction);
+    decay = shared::makeLargeKnob(this, "tubeunit", "decay_knob");
+    shared::bindSlider(this, decay, patchCopy.decay);
 
-    curl_slider = make_slider("curl_slider");
-    shared::bindSlider(this, curl_slider, patchCopy.curl);
+    angle = shared::makeLargeKnob(this, "tubeunit", "angle_knob");
+    shared::bindSlider(this, angle, patchCopy.angle);
 
-    span_slider = make_slider("span_slider");
-    shared::bindSlider(this, span_slider, patchCopy.span);
+    root = shared::makeLargeKnob(this, "tubeunit", "root_knob");
+    shared::bindSlider(this, root, patchCopy.root);
 
-    mass_slider = make_slider("mass_slider");
-    shared::bindSlider(this, mass_slider, patchCopy.mass);
+    spring = shared::makeLargeKnob(this, "tubeunit", "spring_knob");
+    shared::bindSlider(this, spring, patchCopy.spring);
 
-    stif_slider = make_slider("stif_slider");
-    shared::bindSlider(this, stif_slider, patchCopy.stiffness);
-#endif
+    outputLevel = shared::makeLargeKnob(this, "tubeunit", "level_knob");
+    shared::bindSlider(this, outputLevel, patchCopy.outputLevel);
 
-    setSize(300, 600);
+    setSize(286, 600);
     resized();
 
     idleTimer = std::make_unique<IdleTimer>(*this);
