@@ -125,7 +125,7 @@ jobs:
           name: dawplugin-${{ matrix.name }}
 
   publish-plugin-nightly:
-    name: Publish Nightlu
+    name: Publish Nightly
     if: ${{ github.ref == 'refs/heads/main' && github.repository_owner == 'baconpaul' }}
     runs-on: ubuntu-latest
     needs: [build_plugin]
