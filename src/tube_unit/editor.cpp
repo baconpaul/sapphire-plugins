@@ -22,22 +22,6 @@
 namespace sapphire_plugins::tube_unit
 {
 
-// Helper function for placing a control exactly. Juce positioning doesn't take subpixel locations,
-// unlike the rest of Juce. So apply a rounded version of that and add a transform that shunts it to
-// the exact right location.
-//
-// cx and cy are the coordinates from the SVG. These are, for whatever reason, slightly off when
-// used on top of our background. dx and dy are the correction for that off-ness (determined
-// experimentally).
-void set_control_position(juce::Component &control, float cx, float cy, float dx, float dy)
-{
-    juce::Point<float> real{cx + dx, cy + dy};
-    juce::Point<int> rounded = real.toInt();
-    control.setCentrePosition(rounded);
-    control.setTransform(juce::AffineTransform::translation(real.getX() - rounded.getX(),
-                                                            real.getY() - rounded.getY()));
-}
-
 struct IdleTimer : juce::Timer
 {
     TubeUnitEditor &editor;
@@ -105,7 +89,7 @@ TubeUnitEditor::TubeUnitEditor(shared::audioToUIQueue_t &atou, shared::uiToAudio
     setSize(286, 600);
     resized();
 
-    idleTimer = std::make_unique<IdleTimer>(*this);
+    idleTimer = std::make_unique<shared::IdleTimer<TubeUnitEditor>>(*this);
     idleTimer->startTimer(1000. / 60.);
 
     uiToAudio.push({shared::UIToAudioMsg::EDITOR_ATTACH_DETATCH, true});

@@ -20,6 +20,12 @@
 
 namespace sapphire_plugins::shared
 {
+template <typename Editor> struct IdleTimer : juce::Timer
+{
+    Editor &editor;
+    IdleTimer(Editor &e) : editor(e) {}
+    void timerCallback() override { editor.idle(); }
+};
 
 struct AudioToUIMsg
 {
