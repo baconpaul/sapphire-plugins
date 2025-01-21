@@ -19,11 +19,27 @@
 
 #include <clap/plugin.h>
 
-namespace sapphire_plugins::elastika
+namespace sapphire_plugins::gravy
 {
 
-ElastikaEditor::ElastikaEditor(shared::audioToUIQueue_t &atou, shared::uiToAudioQueue_T &utoa,
-                               std::function<void()> flushOperator)
+// Helper function for placing a control exactly. Juce positioning doesn't take subpixel locations,
+// unlike the rest of Juce. So apply a rounded version of that and add a transform that shunts it to
+// the exact right location.
+//
+// cx and cy are the coordinates from the SVG. These are, for whatever reason, slightly off when
+// used on top of our background. dx and dy are the correction for that off-ness (determined
+// experimentally).
+void set_control_position(juce::Component &control, float cx, float cy, float dx, float dy)
+{
+    juce::Point<float> real{cx + dx, cy + dy};
+    juce::Point<int> rounded = real.toInt();
+    control.setCentrePosition(rounded);
+    control.setTransform(juce::AffineTransform::translation(real.getX() - rounded.getX(),
+                                                            real.getY() - rounded.getY()));
+}
+
+GravyEditor::GravyEditor(shared::audioToUIQueue_t &atou, shared::uiToAudioQueue_T &utoa,
+                         std::function<void()> flushOperator)
     : audioToUI(atou), uiToAudio(utoa), flushOperator(flushOperator)
 {
     // Process any events we have
@@ -35,7 +51,7 @@ ElastikaEditor::ElastikaEditor(shared::audioToUIQueue_t &atou, shared::uiToAudio
     lnf = std::make_unique<shared::LookAndFeel>(juce::Drawable::createFromSVG(*knob_xml),
                                                 juce::Drawable::createFromSVG(*marker_xml));
 
-    auto bg = shared::getSvgForPath("libs/sapphire/export/elastika.svg");
+    auto bg = shared::getSvgForPath("libs/sapphire/res/gravy.svg");
     if (bg.has_value())
     {
         auto bgx = juce::XmlDocument::parse(*bg);
@@ -48,51 +64,29 @@ ElastikaEditor::ElastikaEditor(shared::audioToUIQueue_t &atou, shared::uiToAudio
         }
     }
 
-    const std::string modcode("elastika_export");
+    // FIXFIXFIX: text labels live inside tubeunit_labels.svg.
+    // FIXFIXFIX: "vent" lives inside tubeunit_vent.svg.
+    // FIXFIXFIX: "seal" lives inside tubeunit_seal.svg.
 
-    input_tilt_knob = shared::makeLargeKnob(this, modcode, "input_tilt_knob");
-    shared::bindSlider(this, input_tilt_knob, patchCopy.inputTilt);
+    airflow = shared::makeLargeKnob(this, "gravy", "frequency_knob");
+    shared::bindSlider(this, airflow, patchCopy.frequency);
 
-    output_tilt_knob = shared::makeLargeKnob(this, modcode, "output_tilt_knob");
-    shared::bindSlider(this, output_tilt_knob, patchCopy.outputTilt);
-
-    drive_knob = shared::makeLargeKnob(this, modcode, "drive_knob");
-    shared::bindSlider(this, drive_knob, patchCopy.drive);
-
-    level_knob = shared::makeLargeKnob(this, modcode, "level_knob");
-    shared::bindSlider(this, level_knob, patchCopy.level);
-
-    fric_slider = shared::makeSlider(this, modcode, "fric_slider");
-    shared::bindSlider(this, fric_slider, patchCopy.friction);
-
-    curl_slider = shared::makeSlider(this, modcode, "curl_slider");
-    shared::bindSlider(this, curl_slider, patchCopy.curl);
-
-    span_slider = shared::makeSlider(this, modcode, "span_slider");
-    shared::bindSlider(this, span_slider, patchCopy.span);
-
-    mass_slider = shared::makeSlider(this, modcode, "mass_slider");
-    shared::bindSlider(this, mass_slider, patchCopy.mass);
-
-    stif_slider = shared::makeSlider(this, modcode, "stif_slider");
-    shared::bindSlider(this, stif_slider, patchCopy.stiffness);
-
-    setSize(286, 466);
+    setSize(286, 600);
     resized();
 
-    idleTimer = std::make_unique<shared::IdleTimer<ElastikaEditor>>(*this);
+    idleTimer = std::make_unique<shared::IdleTimer<GravyEditor>>(*this);
     idleTimer->startTimer(1000. / 60.);
 
     uiToAudio.push({shared::UIToAudioMsg::EDITOR_ATTACH_DETATCH, true});
 }
 
-ElastikaEditor::~ElastikaEditor()
+GravyEditor::~GravyEditor()
 {
     uiToAudio.push({shared::UIToAudioMsg::EDITOR_ATTACH_DETATCH, false});
     idleTimer->stopTimer();
 }
 
-void ElastikaEditor::resized()
+void GravyEditor::resized()
 {
     if (background)
     {
@@ -100,6 +94,6 @@ void ElastikaEditor::resized()
     }
 }
 
-void ElastikaEditor::idle() { shared::drainQueueFromUI(*this); }
+void GravyEditor::idle() { shared::drainQueueFromUI(*this); }
 
-} // namespace sapphire_plugins::elastika
+} // namespace sapphire_plugins::gravy
