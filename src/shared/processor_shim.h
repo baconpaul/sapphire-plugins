@@ -80,12 +80,12 @@ struct ProcessorShim : plugHelper_t, sst::clap_juce_shim::EditorProvider
     {
         auto sz = ev->size(ev);
 
+        eventQSize = sz;
+        nextEventIndex = 0;
         if (sz != 0)
         {
             nextEvent = ev->get(ev, nextEventIndex);
         }
-        eventQSize = sz;
-        nextEventIndex = 0;
     }
     void processEventsUpTo(size_t sample, const clap_input_events_t *ev)
     {
