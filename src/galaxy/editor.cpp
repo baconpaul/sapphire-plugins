@@ -48,26 +48,25 @@ GalaxyEditor::GalaxyEditor(shared::audioToUIQueue_t &atou, shared::uiToAudioQueu
         }
     }
 
-    // FIXFIXFIX: text labels live inside Galaxy_labels.svg.
-    // FIXFIXFIX: "vent" lives inside Galaxy_vent.svg.
-    // FIXFIXFIX: "seal" lives inside Galaxy_seal.svg.
+    const std::string modcode("galaxy");
 
-    replace = shared::makeLargeKnob(this, "galaxy", "replace_knob");
+    replace = shared::makeLargeKnob(this, modcode, "replace_knob");
     shared::bindSlider(this, replace, patchCopy.replace);
 
-    brightness = shared::makeLargeKnob(this, "galaxy", "brightness_knob");
+    brightness = shared::makeLargeKnob(this, modcode, "brightness_knob");
     shared::bindSlider(this, brightness, patchCopy.brightness);
 
-    detune = shared::makeLargeKnob(this, "galaxy", "detune_knob");
+    detune = shared::makeLargeKnob(this, modcode, "detune_knob");
     shared::bindSlider(this, detune, patchCopy.detune);
 
-    bigness = shared::makeLargeKnob(this, "galaxy", "bigness_knob");
+    bigness = shared::makeLargeKnob(this, modcode, "bigness_knob");
     shared::bindSlider(this, bigness, patchCopy.bigness);
 
-    mix = shared::makeLargeKnob(this, "galaxy", "mix_knob");
+    mix = shared::makeLargeKnob(this, modcode, "mix_knob");
     shared::bindSlider(this, mix, patchCopy.mix);
 
-    setSize(286, 600);
+    auto dim = shared::getPanelDimensions(modcode);
+    setSize(dim.width, dim.height);
     resized();
 
     idleTimer = std::make_unique<shared::IdleTimer<GalaxyEditor>>(*this);

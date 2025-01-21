@@ -15,12 +15,27 @@
 #ifndef SAPPHIRE_PLUGINS_SHARED_GRAPHICS_RESOURCES_H
 #define SAPPHIRE_PLUGINS_SHARED_GRAPHICS_RESOURCES_H
 
+#include <cmath>
 #include <optional>
 #include <string>
+#include "sapphire_panel.hpp"
 
 namespace sapphire_plugins::shared
 {
 std::optional<std::string> getSvgForPath(const std::string &path);
+
+struct PanelDimensions
+{
+    int width;
+    int height;
+
+    explicit PanelDimensions(int _width, int _height)
+        : width(_width)
+        , height(_height)
+        {}
+};
+
+PanelDimensions getPanelDimensions(const std::string& modcode);
 }
 
 #endif // GRAPHICS_RESOURCES_H
