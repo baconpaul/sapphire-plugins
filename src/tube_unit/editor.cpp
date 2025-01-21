@@ -48,38 +48,37 @@ TubeUnitEditor::TubeUnitEditor(shared::audioToUIQueue_t &atou, shared::uiToAudio
         }
     }
 
-    // FIXFIXFIX: text labels live inside tubeunit_labels.svg.
-    // FIXFIXFIX: "vent" lives inside tubeunit_vent.svg.
-    // FIXFIXFIX: "seal" lives inside tubeunit_seal.svg.
+    const std::string modcode("tubeunit");
 
-    airflow = shared::makeLargeKnob(this, "tubeunit", "airflow_knob");
+    airflow = shared::makeLargeKnob(this, modcode, "airflow_knob");
     shared::bindSlider(this, airflow, patchCopy.airflow);
 
-    vortex = shared::makeLargeKnob(this, "tubeunit", "vortex_knob");
+    vortex = shared::makeLargeKnob(this, modcode, "vortex_knob");
     shared::bindSlider(this, vortex, patchCopy.vortex);
 
-    width = shared::makeLargeKnob(this, "tubeunit", "width_knob");
+    width = shared::makeLargeKnob(this, modcode, "width_knob");
     shared::bindSlider(this, width, patchCopy.width);
 
-    center = shared::makeLargeKnob(this, "tubeunit", "center_knob");
+    center = shared::makeLargeKnob(this, modcode, "center_knob");
     shared::bindSlider(this, center, patchCopy.center);
 
-    decay = shared::makeLargeKnob(this, "tubeunit", "decay_knob");
+    decay = shared::makeLargeKnob(this, modcode, "decay_knob");
     shared::bindSlider(this, decay, patchCopy.decay);
 
-    angle = shared::makeLargeKnob(this, "tubeunit", "angle_knob");
+    angle = shared::makeLargeKnob(this, modcode, "angle_knob");
     shared::bindSlider(this, angle, patchCopy.angle);
 
-    root = shared::makeLargeKnob(this, "tubeunit", "root_knob");
+    root = shared::makeLargeKnob(this, modcode, "root_knob");
     shared::bindSlider(this, root, patchCopy.root);
 
-    spring = shared::makeLargeKnob(this, "tubeunit", "spring_knob");
+    spring = shared::makeLargeKnob(this, modcode, "spring_knob");
     shared::bindSlider(this, spring, patchCopy.spring);
 
-    outputLevel = shared::makeLargeKnob(this, "tubeunit", "level_knob");
+    outputLevel = shared::makeLargeKnob(this, modcode, "level_knob");
     shared::bindSlider(this, outputLevel, patchCopy.outputLevel);
 
-    setSize(286, 600);
+    auto dim = shared::getPanelDimensions(modcode);
+    setSize(dim.width, dim.height);
     resized();
 
     idleTimer = std::make_unique<shared::IdleTimer<TubeUnitEditor>>(*this);

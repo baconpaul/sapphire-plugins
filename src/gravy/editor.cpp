@@ -64,14 +64,13 @@ GravyEditor::GravyEditor(shared::audioToUIQueue_t &atou, shared::uiToAudioQueue_
         }
     }
 
-    // FIXFIXFIX: text labels live inside tubeunit_labels.svg.
-    // FIXFIXFIX: "vent" lives inside tubeunit_vent.svg.
-    // FIXFIXFIX: "seal" lives inside tubeunit_seal.svg.
+    const std::string modcode("gravy");
 
-    airflow = shared::makeLargeKnob(this, "gravy", "frequency_knob");
+    airflow = shared::makeLargeKnob(this, modcode, "frequency_knob");
     shared::bindSlider(this, airflow, patchCopy.frequency);
 
-    setSize(286, 600);
+    auto dim = shared::getPanelDimensions(modcode);
+    setSize(dim.width, dim.height);
     resized();
 
     idleTimer = std::make_unique<shared::IdleTimer<GravyEditor>>(*this);

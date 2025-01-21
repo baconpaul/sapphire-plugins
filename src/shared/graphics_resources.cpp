@@ -43,4 +43,16 @@ std::optional<std::string> getSvgForPath(const std::string &path)
     ;
 }
 
+PanelDimensions getPanelDimensions(const std::string& modcode)
+{
+    // Get panel dimensions in VCV Rack millimeter units.
+    auto mmPanel = Sapphire::GetPanelDimensions(modcode);
+
+    // Convert millimeters to pixels.
+    const float pixelsPerMillimeter = 286 / 60.96;
+    int dx = static_cast<int>(std::round(pixelsPerMillimeter * mmPanel.cx));
+    int dy = static_cast<int>(std::round(pixelsPerMillimeter * mmPanel.cy));
+    return PanelDimensions(dx, dy);
+}
+
 } // namespace sapphire_plugins::shared
