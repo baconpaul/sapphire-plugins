@@ -27,11 +27,12 @@
 #include "elastika/elastika.h"
 #include "tube_unit/tube_unit.h"
 #include "gravy/gravy.h"
+#include "galaxy/galaxy.h"
 
 namespace sapphire_plugins
 {
 
-uint32_t clap_get_plugin_count(const clap_plugin_factory *) { return 3; };
+uint32_t clap_get_plugin_count(const clap_plugin_factory *) { return 4; };
 const clap_plugin_descriptor *clap_get_plugin_descriptor(const clap_plugin_factory *f, uint32_t w)
 {
     if (w == 0)
@@ -47,6 +48,11 @@ const clap_plugin_descriptor *clap_get_plugin_descriptor(const clap_plugin_facto
     if (w == 2)
     {
         return gravy::getDescriptor();
+    }
+
+    if (w == 3)
+    {
+        return galaxy::getDescriptor();
     }
 
     return nullptr;
@@ -67,6 +73,11 @@ const clap_plugin *clap_create_plugin(const clap_plugin_factory *f, const clap_h
     if (strcmp(plugin_id, gravy::getDescriptor()->id) == 0)
     {
         return gravy::makePlugin(host);
+    }
+
+    if (strcmp(plugin_id, galaxy::getDescriptor()->id) == 0)
+    {
+        return galaxy::makePlugin(host);
     }
     return nullptr;
 }
@@ -94,6 +105,14 @@ static bool clap_get_auv2_info(const clap_plugin_factory_as_auv2 *factory, uint3
     {
         strncpy(info->au_type, "aufx", 5); // use the features to determine the type
         strncpy(info->au_subt, "grvy", 5);
+
+        return true;
+    }
+
+    if (index == 3)
+    {
+        strncpy(info->au_type, "aufx", 5); // use the features to determine the type
+        strncpy(info->au_subt, "glxy", 5);
 
         return true;
     }
