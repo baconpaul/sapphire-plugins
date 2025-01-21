@@ -19,11 +19,11 @@
 
 #include <clap/plugin.h>
 
-namespace sapphire_plugins::tube_unit
+namespace sapphire_plugins::galaxy
 {
 
-TubeUnitEditor::TubeUnitEditor(shared::audioToUIQueue_t &atou, shared::uiToAudioQueue_T &utoa,
-                               std::function<void()> flushOperator)
+GalaxyEditor::GalaxyEditor(shared::audioToUIQueue_t &atou, shared::uiToAudioQueue_T &utoa,
+                           std::function<void()> flushOperator)
     : audioToUI(atou), uiToAudio(utoa), flushOperator(flushOperator)
 {
     // Process any events we have
@@ -35,7 +35,7 @@ TubeUnitEditor::TubeUnitEditor(shared::audioToUIQueue_t &atou, shared::uiToAudio
     lnf = std::make_unique<shared::LookAndFeel>(juce::Drawable::createFromSVG(*knob_xml),
                                                 juce::Drawable::createFromSVG(*marker_xml));
 
-    auto bg = shared::getSvgForPath("libs/sapphire/export/tubeunit.svg");
+    auto bg = shared::getSvgForPath("libs/sapphire/res/galaxy.svg");
     if (bg.has_value())
     {
         auto bgx = juce::XmlDocument::parse(*bg);
@@ -48,53 +48,41 @@ TubeUnitEditor::TubeUnitEditor(shared::audioToUIQueue_t &atou, shared::uiToAudio
         }
     }
 
-    // FIXFIXFIX: text labels live inside tubeunit_labels.svg.
-    // FIXFIXFIX: "vent" lives inside tubeunit_vent.svg.
-    // FIXFIXFIX: "seal" lives inside tubeunit_seal.svg.
+    // FIXFIXFIX: text labels live inside Galaxy_labels.svg.
+    // FIXFIXFIX: "vent" lives inside Galaxy_vent.svg.
+    // FIXFIXFIX: "seal" lives inside Galaxy_seal.svg.
 
-    airflow = shared::makeLargeKnob(this, "tubeunit", "airflow_knob");
-    shared::bindSlider(this, airflow, patchCopy.airflow);
+    replace = shared::makeLargeKnob(this, "galaxy", "replace_knob");
+    shared::bindSlider(this, replace, patchCopy.replace);
 
-    vortex = shared::makeLargeKnob(this, "tubeunit", "vortex_knob");
-    shared::bindSlider(this, vortex, patchCopy.vortex);
+    brightness = shared::makeLargeKnob(this, "galaxy", "brightness_knob");
+    shared::bindSlider(this, brightness, patchCopy.brightness);
 
-    width = shared::makeLargeKnob(this, "tubeunit", "width_knob");
-    shared::bindSlider(this, width, patchCopy.width);
+    detune = shared::makeLargeKnob(this, "galaxy", "detune_knob");
+    shared::bindSlider(this, detune, patchCopy.detune);
 
-    center = shared::makeLargeKnob(this, "tubeunit", "center_knob");
-    shared::bindSlider(this, center, patchCopy.center);
+    bigness = shared::makeLargeKnob(this, "galaxy", "bigness_knob");
+    shared::bindSlider(this, bigness, patchCopy.bigness);
 
-    decay = shared::makeLargeKnob(this, "tubeunit", "decay_knob");
-    shared::bindSlider(this, decay, patchCopy.decay);
-
-    angle = shared::makeLargeKnob(this, "tubeunit", "angle_knob");
-    shared::bindSlider(this, angle, patchCopy.angle);
-
-    root = shared::makeLargeKnob(this, "tubeunit", "root_knob");
-    shared::bindSlider(this, root, patchCopy.root);
-
-    spring = shared::makeLargeKnob(this, "tubeunit", "spring_knob");
-    shared::bindSlider(this, spring, patchCopy.spring);
-
-    outputLevel = shared::makeLargeKnob(this, "tubeunit", "level_knob");
-    shared::bindSlider(this, outputLevel, patchCopy.outputLevel);
+    mix = shared::makeLargeKnob(this, "galaxy", "mix_knob");
+    shared::bindSlider(this, mix, patchCopy.mix);
 
     setSize(286, 600);
     resized();
 
-    idleTimer = std::make_unique<shared::IdleTimer<TubeUnitEditor>>(*this);
+    idleTimer = std::make_unique<shared::IdleTimer<GalaxyEditor>>(*this);
     idleTimer->startTimer(1000. / 60.);
 
     uiToAudio.push({shared::UIToAudioMsg::EDITOR_ATTACH_DETATCH, true});
 }
 
-TubeUnitEditor::~TubeUnitEditor()
+GalaxyEditor::~GalaxyEditor()
 {
     uiToAudio.push({shared::UIToAudioMsg::EDITOR_ATTACH_DETATCH, false});
     idleTimer->stopTimer();
 }
 
-void TubeUnitEditor::resized()
+void GalaxyEditor::resized()
 {
     if (background)
     {
@@ -102,6 +90,6 @@ void TubeUnitEditor::resized()
     }
 }
 
-void TubeUnitEditor::idle() { shared::drainQueueFromUI(*this); }
+void GalaxyEditor::idle() { shared::drainQueueFromUI(*this); }
 
-} // namespace sapphire_plugins::tube_unit
+} // namespace sapphire_plugins::galaxy

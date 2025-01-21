@@ -59,8 +59,8 @@ add_library(${PROJECT_NAME}-impl STATIC
         src/gravy/processor.cpp
         src/gravy/editor.cpp
 
-        #src/galaxy/processor.cpp
-        #src/galaxy/editor.cpp
+        src/galaxy/processor.cpp
+        src/galaxy/editor.cpp
 
         src/shared/graphics_resources.cpp
         src/shared/sapphire_lnf.cpp
