@@ -49,7 +49,7 @@ PanelDimensions getPanelDimensions(const std::string& modcode)
     auto mmPanel = Sapphire::GetPanelDimensions(modcode);
 
     // Convert millimeters to pixels.
-    const float pixelsPerMillimeter = 286 / 60.96;
+    const float pixelsPerMillimeter = 600 / 128.5;
     int dx = static_cast<int>(std::round(pixelsPerMillimeter * mmPanel.cx));
     int dy = static_cast<int>(std::round(pixelsPerMillimeter * mmPanel.cy));
     return PanelDimensions(dx, dy);

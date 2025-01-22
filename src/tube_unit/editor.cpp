@@ -48,7 +48,7 @@ TubeUnitEditor::TubeUnitEditor(shared::audioToUIQueue_t &atou, shared::uiToAudio
         }
     }
 
-    const std::string modcode("tubeunit");
+    const std::string modcode("tubeunit_export");
 
     airflow = shared::makeLargeKnob(this, modcode, "airflow_knob");
     shared::bindSlider(this, airflow, patchCopy.airflow);
