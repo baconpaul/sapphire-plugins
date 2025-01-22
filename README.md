@@ -9,19 +9,21 @@ To build
 git clone https://github.com/baconpaul/sapphire-plugins
 cd sapphire-plugins
 git submodule update --init --recursive
-cmake -Bignore/bld -DCMAKE_BUILD_TYPE=Release  
+cmake -Bignore/bld -DCMAKE_BUILD_TYPE=Release
 cmake --build ignore/bld --target sapphire-plugins_all
 ```
 
-If you don't want to copy the built plugins (mac/lin) after build do 
+If you don't want to copy the built plugins (mac/lin) after build do
 
 ```
 cmake -Bignore/bld -DCMAKE_BUILD_TYPE=Release -DCOPY_AFTER_BUILD=FALSE
 ```
 
-and then install the resulting artifact by hand. 
+and then install the resulting artifact by hand.
 
-Right now has
+The following Sapphire modules are included:
 
 - Elastika
+- Galaxy
+- Gravy
 - Tube Unit
