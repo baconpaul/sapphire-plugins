@@ -51,7 +51,7 @@ GravyEditor::GravyEditor(shared::audioToUIQueue_t &atou, shared::uiToAudioQueue_
     lnf = std::make_unique<shared::LookAndFeel>(juce::Drawable::createFromSVG(*knob_xml),
                                                 juce::Drawable::createFromSVG(*marker_xml));
 
-    auto bg = shared::getSvgForPath("libs/sapphire/res/gravy.svg");
+    auto bg = shared::getSvgForPath("libs/sapphire/export/gravy.svg");
     if (bg.has_value())
     {
         auto bgx = juce::XmlDocument::parse(*bg);
@@ -64,10 +64,21 @@ GravyEditor::GravyEditor(shared::audioToUIQueue_t &atou, shared::uiToAudioQueue_
         }
     }
 
-    const std::string modcode("gravy");
+    const std::string modcode("gravy_export");
 
-    airflow = shared::makeLargeKnob(this, modcode, "frequency_knob");
-    shared::bindSlider(this, airflow, patchCopy.frequency);
+    frequency = shared::makeLargeKnob(this, modcode, "frequency_knob");
+    shared::bindSlider(this, frequency, patchCopy.frequency);
+
+    resonance = shared::makeLargeKnob(this, modcode, "resonance_knob");
+    shared::bindSlider(this, resonance, patchCopy.resonance);
+
+    mix = shared::makeLargeKnob(this, modcode, "mix_knob");
+    shared::bindSlider(this, mix, patchCopy.mix);
+
+    gain = shared::makeLargeKnob(this, modcode, "gain_knob");
+    shared::bindSlider(this, gain, patchCopy.gain);
+
+    // FIXFIXFIX - add 3-way switch MODE (LP, BP, HP) for "mode_switch"
 
     auto dim = shared::getPanelDimensions(modcode);
     setSize(dim.width, dim.height);

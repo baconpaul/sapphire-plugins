@@ -35,7 +35,7 @@ GalaxyEditor::GalaxyEditor(shared::audioToUIQueue_t &atou, shared::uiToAudioQueu
     lnf = std::make_unique<shared::LookAndFeel>(juce::Drawable::createFromSVG(*knob_xml),
                                                 juce::Drawable::createFromSVG(*marker_xml));
 
-    auto bg = shared::getSvgForPath("libs/sapphire/res/galaxy.svg");
+    auto bg = shared::getSvgForPath("libs/sapphire/export/galaxy.svg");
     if (bg.has_value())
     {
         auto bgx = juce::XmlDocument::parse(*bg);
@@ -48,7 +48,7 @@ GalaxyEditor::GalaxyEditor(shared::audioToUIQueue_t &atou, shared::uiToAudioQueu
         }
     }
 
-    const std::string modcode("galaxy");
+    const std::string modcode("galaxy_export");
 
     replace = shared::makeLargeKnob(this, modcode, "replace_knob");
     shared::bindSlider(this, replace, patchCopy.replace);

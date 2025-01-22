@@ -41,15 +41,11 @@ struct GravyEditor : public juce::Component
 
     std::unique_ptr<juce::Drawable> background;
 
-    std::unique_ptr<juce::Slider> airflow;
-    std::unique_ptr<juce::Slider> vortex;
-    std::unique_ptr<juce::Slider> width;
-    std::unique_ptr<juce::Slider> center;
-    std::unique_ptr<juce::Slider> decay;
-    std::unique_ptr<juce::Slider> angle;
-    std::unique_ptr<juce::Slider> root;
-    std::unique_ptr<juce::Slider> spring;
-    std::unique_ptr<juce::Slider> outputLevel;
+    std::unique_ptr<juce::Slider> frequency;
+    std::unique_ptr<juce::Slider> resonance;
+    std::unique_ptr<juce::Slider> mix;
+    std::unique_ptr<juce::Slider> gain;
+    // FIXFIXFIX: add 3-way switch: MODE (LP, BP, HP)
 
     std::unique_ptr<shared::LookAndFeel> lnf;
 
