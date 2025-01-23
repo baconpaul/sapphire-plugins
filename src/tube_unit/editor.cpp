@@ -77,7 +77,7 @@ TubeUnitEditor::TubeUnitEditor(shared::audioToUIQueue_t &atou, shared::uiToAudio
     mix = shared::makeLargeKnob(this, modcode, "mix_knob");
     shared::bindSlider(this, mix, patchCopy.mix);
 
-    auto dim = shared::getPanelDimensions(modcode);
+    auto dim = shared::getPanelDimensions(modcode, 2);
     setSize(dim.width, dim.height);
     resized();
 

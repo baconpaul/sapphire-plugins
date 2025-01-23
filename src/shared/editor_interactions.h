@@ -190,8 +190,7 @@ template <typename Editor> inline void showTooltip(Editor *e, const juce::Slider
         leftSide = false;
     auto centered = false;
     if (std::fabs(b.getX() + b.getWidth() / 2 - pb.getWidth() / 2) < 3)
-        centered = true;;
-
+        centered = true;
 
     auto r = juce::Rectangle<int>(0, 0, 25, 11);
     if (topHalf)

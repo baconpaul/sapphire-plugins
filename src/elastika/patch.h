@@ -72,23 +72,23 @@ struct Patch : pats::PatchBase<Patch, Param>
                     .withDefault(1.f)),
           mix(floatMd()
                     .withName("Mix")
-                    .withID(190)
+                    .withID(170)
                     .withRange(0., 1.)
                     .withLinearScaleFormatting("")
                     .withDefault(1.f)),
           inputTilt(floatMd()
-                        .withName("Input Tilt")
-                        .withID(170)
-                        .withRange(0., 1.)
-                        .withDefault(0.5)
-                        .withLinearScaleFormatting(u8"\u00B0", 90)),
+                    .withName("Input Tilt")
+                    .withID(180)
+                    .withRange(0., 1.)
+                    .withDefault(0.5)
+                    .withLinearScaleFormatting(u8"\u00B0", 90)),
           outputTilt(floatMd()
-                         .withName("Output Tilt")
-                         .withID(180)
-                         .withRange(0, 1)
-                         .withDefault(0.5)
-                         .withDecimalPlaces(3)
-                         .withLinearScaleFormatting(u8"\u00B0", 90))
+                     .withName("Output Tilt")
+                     .withID(190)
+                     .withRange(0, 1)
+                     .withDefault(0.5)
+                     .withDecimalPlaces(3)
+                     .withLinearScaleFormatting(u8"\u00B0", 90))
     {
         this->pushSingleParam(&friction);
         this->pushSingleParam(&stiffness);

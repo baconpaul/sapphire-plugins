@@ -80,7 +80,7 @@ ElastikaEditor::ElastikaEditor(shared::audioToUIQueue_t &atou, shared::uiToAudio
     stif_slider = shared::makeSlider(this, modcode, "stif_slider");
     shared::bindSlider(this, stif_slider, patchCopy.stiffness);
 
-    auto dim = shared::getPanelDimensions(modcode);
+    auto dim = shared::getPanelDimensions(modcode, 1);
     setSize(dim.width, dim.height);
     resized();
 

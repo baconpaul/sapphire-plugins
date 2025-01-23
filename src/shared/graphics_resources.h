@@ -35,7 +35,10 @@ struct PanelDimensions
         {}
 };
 
-PanelDimensions getPanelDimensions(const std::string& modcode);
+PanelDimensions getPanelDimensions(
+    const std::string& modcode,
+    int widthCorrection    // FIXFIXFIX: this is a temporary hack to prevent black gaps in the plugin window
+);
 }
 
 #endif // GRAPHICS_RESOURCES_H
