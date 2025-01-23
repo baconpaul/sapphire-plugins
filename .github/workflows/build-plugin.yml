@@ -135,7 +135,6 @@ jobs:
           mkdir build/insttmp
 
           mv build/*.clap build/insttmp
-          mv "build/Sapphire" build/insttmp
           mv build/Release/*.vst3 build/insttmp
 
           find build -name "Sapphire*" -print
