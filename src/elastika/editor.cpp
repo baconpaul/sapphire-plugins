@@ -62,6 +62,9 @@ ElastikaEditor::ElastikaEditor(shared::audioToUIQueue_t &atou, shared::uiToAudio
     level_knob = shared::makeLargeKnob(this, modcode, "level_knob");
     shared::bindSlider(this, level_knob, patchCopy.level);
 
+    mix_knob = shared::makeLargeKnob(this, modcode, "mix_knob");
+    shared::bindSlider(this, mix_knob, patchCopy.mix);
+
     fric_slider = shared::makeSlider(this, modcode, "fric_slider");
     shared::bindSlider(this, fric_slider, patchCopy.friction);
 

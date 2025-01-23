@@ -84,6 +84,7 @@ struct ElastikaClap : public shared::ProcessorShim<ElastikaClap>
                 engine->setMass(patch.mass.lag.v);
                 engine->setDrive(patch.drive.lag.v);
                 engine->setGain(patch.level.lag.v);
+                engine->setMix(patch.mix.lag.v);
                 engine->setInputTilt(patch.inputTilt.lag.v);
                 engine->setOutputTilt(patch.outputTilt.lag.v);
             }
