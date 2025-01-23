@@ -72,7 +72,7 @@ struct Patch : pats::PatchBase<Patch, Param>
                     .withDefault(1.f)),
           mix(floatMd()
                     .withName("Mix")
-                    .withID(160)
+                    .withID(190)
                     .withRange(0., 1.)
                     .withLinearScaleFormatting("")
                     .withDefault(1.f)),

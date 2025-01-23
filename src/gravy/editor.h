@@ -45,7 +45,7 @@ struct GravyEditor : public juce::Component
     std::unique_ptr<juce::Slider> resonance;
     std::unique_ptr<juce::Slider> mix;
     std::unique_ptr<juce::Slider> gain;
-    // FIXFIXFIX: add 3-way switch: MODE (LP, BP, HP)
+    std::unique_ptr<juce::Slider> mode;
 
     std::unique_ptr<shared::LookAndFeel> lnf;
 

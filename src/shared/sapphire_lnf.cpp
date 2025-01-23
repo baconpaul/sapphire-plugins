@@ -34,13 +34,48 @@ void LookAndFeel::drawLinearSlider(juce::Graphics &g, int x, int y, int width, i
                                    const Slider::SliderStyle style, Slider &slider)
 {
     // Only specialized version for vertical sliders.
-    if (style != Slider::LinearVertical)
+    if (style != Slider::LinearVertical && style != Slider::LinearHorizontal)
     {
         juce::LookAndFeel_V4::drawLinearSlider(g, x, y, width, height, sliderPos, minSliderPos,
                                                maxSliderPos, style, slider);
         return;
     }
 
+    if (style == Slider::LinearHorizontal)
+    {
+        g.setColour(findColour(Slider::backgroundColourId));
+        g.fillRoundedRectangle(x, y, width, height, 0.5f);
+
+        float tsp = sliderPos - width * 0.1;
+        float tw = width * 0.2;
+        auto pd = 0.4;
+        auto ypd = 0.6;
+        if (tsp < x + pd)
+        {
+            auto diff = x + pd - tsp;
+            tsp += diff;
+
+        }
+        if (tsp + tw > x + width - pd)
+        {
+            auto diff = tsp + tw - (x + width - pd);
+            tsp -= diff;
+        }
+
+        g.setColour(juce::Colour(190,190,190));
+        g.fillRect(tsp, (float)y + ypd, tw, (float)height - ypd * 2);
+        g.setColour(juce::Colour(130,130,130));
+        auto lw = tw/3;
+        for (int i=0; i<3; ++i)
+        {
+            g.drawLine(tsp + lw * (i+0.5), (float)y + ypd, tsp + lw * (i+0.5), (float)y + height - ypd, lw * 0.5);
+        }
+
+        g.setColour(findColour(Slider::backgroundColourId));
+        g.drawRoundedRectangle(x, y, width, height, 0.5f, pd);
+
+        return;
+    }
     const float unit = float(height) / 100.f;
 
     // Draw the slider track. The width value is taken from LookAndFeel_V4.

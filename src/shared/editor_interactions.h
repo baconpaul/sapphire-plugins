@@ -17,6 +17,7 @@
 
 #include "sapphire_panel.hpp"
 #include "tooltip.h"
+#include <sst/basic-blocks/params/ParamMetadata.h>
 
 namespace sapphire_plugins::shared
 {
@@ -180,7 +181,6 @@ template <typename Editor> inline void showTooltip(Editor *e, const juce::Slider
 
     auto b = s.getBoundsInParent();
     auto pb = s.getParentComponent()->getLocalBounds();
-    ;
 
     auto topHalf = true;
     if (b.getY() > pb.getHeight() / 2)
@@ -188,6 +188,10 @@ template <typename Editor> inline void showTooltip(Editor *e, const juce::Slider
     auto leftSide = true;
     if (b.getX() > pb.getWidth() / 2)
         leftSide = false;
+    auto centered = false;
+    if (std::fabs(b.getX() + b.getWidth() / 2 - pb.getWidth() / 2) < 3)
+        centered = true;;
+
 
     auto r = juce::Rectangle<int>(0, 0, 25, 11);
     if (topHalf)
@@ -195,7 +199,9 @@ template <typename Editor> inline void showTooltip(Editor *e, const juce::Slider
     else
         r = r.translated(0, b.getY() - r.getHeight());
 
-    if (leftSide)
+    if (centered)
+        r = r.translated(b.getX() + b.getWidth()/2 - r.getWidth()/2, 0);
+    else if (leftSide)
         r = r.translated(b.getX(), 0);
     else
         r = r.translated(b.getRight() - r.getWidth(), 0);
@@ -225,6 +231,13 @@ inline void bindSlider(Editor *editor, const std::unique_ptr<juce::Slider> &slid
     auto dval01 = (p.meta.defaultVal - p.meta.minVal) / (p.meta.maxVal - p.meta.minVal);
     slider->setValue(val01, juce::dontSendNotification);
     slider->setDoubleClickReturnValue(true, dval01);
+
+    if (p.meta.type == sst::basic_blocks::params::ParamMetaData::INT)
+    {
+        auto dist = p.meta.maxVal - p.meta.minVal;
+        if (dist > 1)
+            slider->setRange(0, 1, 1.0/dist);
+    }
 
     slider->onDragStart =
         [editor, sl = juce::Component::SafePointer(slider.get()), id = p.meta.id]()
@@ -318,6 +331,32 @@ std::unique_ptr<juce::Slider> makeSlider(Editor *editor, const std::string &pref
     // is the very top pixel of the thumb). Until then, it doesn't work right throughout the whole
     // track, so we set this to false.
     sl->setSliderSnapsToMousePosition(false);
+
+    editor->background->addAndMakeVisible(*sl);
+    set_control_position(*sl, cx, cy, dx, dy);
+    return sl;
+}
+
+template <typename Editor>
+std::unique_ptr<juce::Slider> makeThreePositionSwitch(Editor *editor, const std::string &prefix,
+                                         const std::string pos)
+{
+    auto r = Sapphire::FindComponent(prefix, pos);
+    auto cx = r.cx;
+    auto cy = r.cy;
+
+    static constexpr float dx = 2;
+    static constexpr float dy = 1;
+    auto sl = std::make_unique<juce::Slider>();
+    sl->setSliderStyle(juce::Slider::LinearHorizontal);
+    sl->setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
+    sl->setSize(16, 5);
+    sl->setMouseDragSensitivity(28);
+    sl->setRange(0, 1);
+    sl->setValue(0.5);
+    sl->setDoubleClickReturnValue(true, 0.5);
+    sl->setSliderSnapsToMousePosition(false);
+    sl->setLookAndFeel(editor->lnf.get());
 
     editor->background->addAndMakeVisible(*sl);
     set_control_position(*sl, cx, cy, dx, dy);
