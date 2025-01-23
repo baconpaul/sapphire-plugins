@@ -222,7 +222,9 @@ inline void bindSlider(Editor *editor, const std::unique_ptr<juce::Slider> &slid
 {
     slider->setTitle(p.meta.name);
     auto val01 = (p.value - p.meta.minVal) / (p.meta.maxVal - p.meta.minVal);
+    auto dval01 = (p.meta.defaultVal - p.meta.minVal) / (p.meta.maxVal - p.meta.minVal);
     slider->setValue(val01, juce::dontSendNotification);
+    slider->setDoubleClickReturnValue(true, dval01);
 
     slider->onDragStart =
         [editor, sl = juce::Component::SafePointer(slider.get()), id = p.meta.id]()
