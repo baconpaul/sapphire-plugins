@@ -87,7 +87,8 @@ struct TubeUnitClap : public shared::ProcessorShim<TubeUnitClap>
 
                 for (auto &[i, p] : patch.paramMap)
                     p->lag.process();
-                engine->setGain(patch.outputLevel.lag.v);
+
+                engine->setMix(patch.mix.lag.v);
                 engine->setAirflow(patch.airflow.lag.v);
                 engine->setVortex(patch.vortex.lag.v);
                 engine->setBypassWidth(patch.width.lag.v);

@@ -74,8 +74,8 @@ TubeUnitEditor::TubeUnitEditor(shared::audioToUIQueue_t &atou, shared::uiToAudio
     spring = shared::makeLargeKnob(this, modcode, "spring_knob");
     shared::bindSlider(this, spring, patchCopy.spring);
 
-    outputLevel = shared::makeLargeKnob(this, modcode, "level_knob");
-    shared::bindSlider(this, outputLevel, patchCopy.outputLevel);
+    mix = shared::makeLargeKnob(this, modcode, "mix_knob");
+    shared::bindSlider(this, mix, patchCopy.mix);
 
     auto dim = shared::getPanelDimensions(modcode);
     setSize(dim.width, dim.height);

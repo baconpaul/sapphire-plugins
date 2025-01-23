@@ -51,7 +51,7 @@ struct Patch : pats::PatchBase<Patch, Param>
     Param angle;
     Param root;
     Param spring;
-    Param outputLevel;
+    Param mix;
 
     Patch()
         : pats::PatchBase<Patch, Param>(), airflow(floatMd()
@@ -73,7 +73,11 @@ struct Patch : pats::PatchBase<Patch, Param>
                      .withRange(-10, 10)
                      .withDefault(0.f)
                      .withLinearScaleFormatting("")),
-          decay(floatMd().withName("Reflection Decay").withID(140).asPercent().withDefault(0.5f)),
+          decay(floatMd()
+                    .withName("Reflection Decay")
+                    .withID(140)
+                    .asPercent()
+                    .withDefault(0.5f)),
           angle(floatMd()
                     .withName("Reflection Angle")
                     .withID(150)
@@ -86,13 +90,17 @@ struct Patch : pats::PatchBase<Patch, Param>
                    .withRange(0., 8.)
                    .withDefault(2.7279248)
                    .withATwoToTheBFormatting(4, 1, "hz")),
-          spring(floatMd().withName("Spring Stiffness").withID(170).asPercent().withDefault(0.5)),
-          outputLevel(floatMd()
-                          .withName("Output Level")
-                          .withID(180)
-                          .withRange(0.0, 2.0)
-                          .withLinearScaleFormatting("")
-                          .withDefault(1.0))
+          spring(floatMd()
+                   .withName("Spring Stiffness")
+                   .withID(170)
+                   .asPercent()
+                   .withDefault(0.5)),
+          mix(floatMd()
+                   .withName("Mix")
+                   .withID(180)
+                   .withRange(0.0, 1.0)
+                   .withLinearScaleFormatting("")
+                   .withDefault(1.0))
 
     {
         this->pushSingleParam(&airflow);
@@ -103,7 +111,7 @@ struct Patch : pats::PatchBase<Patch, Param>
         this->pushSingleParam(&angle);
         this->pushSingleParam(&root);
         this->pushSingleParam(&spring);
-        this->pushSingleParam(&outputLevel);
+        this->pushSingleParam(&mix);
 
         onResetToInit = [](auto &patch)
         {
