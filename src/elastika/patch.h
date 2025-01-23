@@ -44,7 +44,7 @@ struct Patch : pats::PatchBase<Patch, Param>
 
     static md_t floatMd() { return md_t().asFloat().withFlags(floatFlags); }
 
-    Param friction, stiffness, span, curl, mass, drive, level, inputTilt, outputTilt;
+    Param friction, stiffness, span, curl, mass, drive, level, mix, inputTilt, outputTilt;
 
     Patch()
         : pats::PatchBase<Patch, Param>(),
@@ -70,6 +70,12 @@ struct Patch : pats::PatchBase<Patch, Param>
                     .withRange(0., 2.)
                     .withLinearScaleFormatting("")
                     .withDefault(1.f)),
+          mix(floatMd()
+                    .withName("Mix")
+                    .withID(160)
+                    .withRange(0., 1.)
+                    .withLinearScaleFormatting("")
+                    .withDefault(1.f)),
           inputTilt(floatMd()
                         .withName("Input Tilt")
                         .withID(170)
@@ -91,6 +97,7 @@ struct Patch : pats::PatchBase<Patch, Param>
         this->pushSingleParam(&mass);
         this->pushSingleParam(&drive);
         this->pushSingleParam(&level);
+        this->pushSingleParam(&mix);
         this->pushSingleParam(&inputTilt);
         this->pushSingleParam(&outputTilt);
 

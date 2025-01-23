@@ -46,6 +46,7 @@ struct ElastikaEditor : public juce::Component
     std::unique_ptr<juce::Slider> output_tilt_knob;
     std::unique_ptr<juce::Slider> drive_knob;
     std::unique_ptr<juce::Slider> level_knob;
+    std::unique_ptr<juce::Slider> mix_knob;
 
     std::unique_ptr<juce::Slider> fric_slider;
     std::unique_ptr<juce::Slider> mass_slider;
