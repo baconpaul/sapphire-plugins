@@ -65,7 +65,7 @@ GravyEditor::GravyEditor(shared::audioToUIQueue_t &atou, shared::uiToAudioQueue_
     mode = shared::makeThreePositionSwitch(this, modcode, "mode_switch");
     shared::bindSlider(this, mode, patchCopy.mode);
 
-    auto dim = shared::getPanelDimensions(modcode);
+    auto dim = shared::getPanelDimensions(modcode, 3);
     setSize(dim.width, dim.height);
     resized();
 
