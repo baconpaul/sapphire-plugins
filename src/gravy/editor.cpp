@@ -22,22 +22,6 @@
 namespace sapphire_plugins::gravy
 {
 
-// Helper function for placing a control exactly. Juce positioning doesn't take subpixel locations,
-// unlike the rest of Juce. So apply a rounded version of that and add a transform that shunts it to
-// the exact right location.
-//
-// cx and cy are the coordinates from the SVG. These are, for whatever reason, slightly off when
-// used on top of our background. dx and dy are the correction for that off-ness (determined
-// experimentally).
-void set_control_position(juce::Component &control, float cx, float cy, float dx, float dy)
-{
-    juce::Point<float> real{cx + dx, cy + dy};
-    juce::Point<int> rounded = real.toInt();
-    control.setCentrePosition(rounded);
-    control.setTransform(juce::AffineTransform::translation(real.getX() - rounded.getX(),
-                                                            real.getY() - rounded.getY()));
-}
-
 GravyEditor::GravyEditor(shared::audioToUIQueue_t &atou, shared::uiToAudioQueue_T &utoa,
                          std::function<void()> flushOperator)
     : audioToUI(atou), uiToAudio(utoa), flushOperator(flushOperator)
@@ -78,7 +62,8 @@ GravyEditor::GravyEditor(shared::audioToUIQueue_t &atou, shared::uiToAudioQueue_
     gain = shared::makeLargeKnob(this, modcode, "gain_knob");
     shared::bindSlider(this, gain, patchCopy.gain);
 
-    // FIXFIXFIX - add 3-way switch MODE (LP, BP, HP) for "mode_switch"
+    mode = shared::makeThreePositionSwitch(this, modcode, "mode_switch");
+    shared::bindSlider(this, mode, patchCopy.mode);
 
     auto dim = shared::getPanelDimensions(modcode);
     setSize(dim.width, dim.height);
