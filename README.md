@@ -1,7 +1,6 @@
 # Sapphire
 
-A second try, using clap-first tech, and bringing
-the Sapphire dsp to your daw
+CLAP-first tech, bringing the Sapphire DSP to your DAW.
 
 To build
 
@@ -23,7 +22,11 @@ and then install the resulting artifact by hand.
 
 The following Sapphire modules are included:
 
-- Elastika
-- Galaxy
-- Gravy
-- Tube Unit
+- **Elastika**: physical simulation of balls and springs
+- **Galaxy**: a port of the Airwindows Galactic algorithm
+- **Gravy**: a simple stereo filter with frequency and resonance controls. Works in lowpass, bandpass, and highpass modes.
+- **Tube Unit**: a stereo tubular resonance thing. Great for making weird noises!
+
+A screenshot of all four running inside Bitwig Studio:
+
+![Sapphire running in a DAW](images/dawsapphire.png)
