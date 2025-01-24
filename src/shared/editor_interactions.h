@@ -296,7 +296,8 @@ std::unique_ptr<juce::Slider> makeLargeKnob(Editor *editor, const std::string &p
     kn->setSize(11, 11);
     kn->setRange(0, 1);
     kn->setValue(0.5);
-    kn->setMouseDragSensitivity(100);
+    kn->setMouseDragSensitivity(40);
+    kn->setVelocityModeParameters(100, 0);
     kn->setDoubleClickReturnValue(true, 0.5);
     kn->setLookAndFeel(editor->lnf.get());
 
@@ -320,7 +321,9 @@ std::unique_ptr<juce::Slider> makeSlider(Editor *editor, const std::string &pref
     sl->setSliderStyle(juce::Slider::LinearVertical);
     sl->setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
     sl->setSize(10, 28);
-    sl->setMouseDragSensitivity(28);
+    sl->setMouseDragSensitivity(40);
+    sl->setVelocityModeParameters(100, 0);
+
     sl->setRange(0, 1);
     sl->setValue(0.5);
     sl->setDoubleClickReturnValue(true, 0.5);
@@ -350,7 +353,6 @@ std::unique_ptr<juce::Slider> makeThreePositionSwitch(Editor *editor, const std:
     sl->setSliderStyle(juce::Slider::LinearHorizontal);
     sl->setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
     sl->setSize(16, 5);
-    sl->setMouseDragSensitivity(28);
     sl->setRange(0, 1);
     sl->setValue(0.5);
     sl->setDoubleClickReturnValue(true, 0.5);
