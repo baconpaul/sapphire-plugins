@@ -354,7 +354,7 @@ std::unique_ptr<juce::Slider> makeThreePositionSwitch(Editor *editor, const std:
     sl->setRange(0, 1);
     sl->setValue(0.5);
     sl->setDoubleClickReturnValue(true, 0.5);
-    sl->setSliderSnapsToMousePosition(false);
+    sl->setSliderSnapsToMousePosition(true);
     sl->setLookAndFeel(editor->lnf.get());
 
     editor->background->addAndMakeVisible(*sl);
