@@ -230,7 +230,7 @@ struct ProcessorShim : plugHelper_t, sst::clap_juce_shim::EditorProvider
             p->snap();
         }
 
-        // engine->postLoad();
+        pushFullUIRefresh();
         _host.paramsRequestFlush();
         return true;
     }
