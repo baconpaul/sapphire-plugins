@@ -62,13 +62,13 @@ struct Patch : pats::PatchBase<Patch, Param>
                     .withName("Drive")
                     .withID(150)
                     .withRange(0., 2.)
-                    .withLinearScaleFormatting("")
+                    .withLogarithmicFormating("dB", 80, 10)
                     .withDefault(1.f)),
           level(floatMd()
                     .withName("Level")
                     .withID(160)
                     .withRange(0., 2.)
-                    .withLinearScaleFormatting("")
+                    .withLogarithmicFormating("dB", 80, 10)
                     .withDefault(1.f)),
           mix(floatMd()
                     .withName("Mix")
