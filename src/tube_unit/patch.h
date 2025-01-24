@@ -58,7 +58,7 @@ struct Patch : pats::PatchBase<Patch, Param>
                                                        .withName("Airflow")
                                                        .withID(100)
                                                        .withRange(0, 5)
-                                                       .withDefault(1)
+                                                       .withDefault(0)
                                                        .withLinearScaleFormatting("")),
           vortex(floatMd().withName("Vortex").withID(110).asPercent().withDefault(0.5)),
           width(floatMd()
