@@ -50,31 +50,32 @@ TubeUnitEditor::TubeUnitEditor(shared::audioToUIQueue_t &atou, shared::uiToAudio
 
     const std::string modcode("tubeunit_export");
 
-    airflow = shared::makeLargeKnob(this, modcode, "airflow_knob");
+    // see #33 for this 1.0
+    airflow = shared::makeLargeKnob(this, modcode, "airflow_knob", 1.0);
     shared::bindSlider(this, airflow, patchCopy.airflow);
 
-    vortex = shared::makeLargeKnob(this, modcode, "vortex_knob");
+    vortex = shared::makeLargeKnob(this, modcode, "vortex_knob", 1.0);
     shared::bindSlider(this, vortex, patchCopy.vortex);
 
-    width = shared::makeLargeKnob(this, modcode, "width_knob");
+    width = shared::makeLargeKnob(this, modcode, "width_knob", 1.0);
     shared::bindSlider(this, width, patchCopy.width);
 
-    center = shared::makeLargeKnob(this, modcode, "center_knob");
+    center = shared::makeLargeKnob(this, modcode, "center_knob", 1.0);
     shared::bindSlider(this, center, patchCopy.center);
 
-    decay = shared::makeLargeKnob(this, modcode, "decay_knob");
+    decay = shared::makeLargeKnob(this, modcode, "decay_knob", 1.0);
     shared::bindSlider(this, decay, patchCopy.decay);
 
-    angle = shared::makeLargeKnob(this, modcode, "angle_knob");
+    angle = shared::makeLargeKnob(this, modcode, "angle_knob", 1.0);
     shared::bindSlider(this, angle, patchCopy.angle);
 
-    root = shared::makeLargeKnob(this, modcode, "root_knob");
+    root = shared::makeLargeKnob(this, modcode, "root_knob", 1.0);
     shared::bindSlider(this, root, patchCopy.root);
 
-    spring = shared::makeLargeKnob(this, modcode, "spring_knob");
+    spring = shared::makeLargeKnob(this, modcode, "spring_knob", 1.0);
     shared::bindSlider(this, spring, patchCopy.spring);
 
-    mix = shared::makeLargeKnob(this, modcode, "mix_knob");
+    mix = shared::makeLargeKnob(this, modcode, "mix_knob", 1.0);
     shared::bindSlider(this, mix, patchCopy.mix);
 
     auto dim = shared::getPanelDimensions(modcode, 2);
