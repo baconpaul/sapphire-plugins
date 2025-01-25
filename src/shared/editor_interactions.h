@@ -281,14 +281,15 @@ inline void set_control_position(juce::Component &control, float cx, float cy, f
 }
 template <typename Editor>
 std::unique_ptr<juce::Slider> makeLargeKnob(Editor *editor, const std::string &prefix,
-                                            const std::string pos)
+                                            const std::string pos,
+                                            float extraDx = 0.f) // see #33
 {
     auto r = Sapphire::FindComponent(prefix, pos);
     auto cx = r.cx;
     auto cy = r.cy;
 
-    static constexpr float dx = 1.5;
-    static constexpr float dy = 0.0;
+    float dx = 1.5 - extraDx;
+    float dy = 0.5;
     auto kn = std::make_unique<juce::Slider>();
     kn->setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
     kn->setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
